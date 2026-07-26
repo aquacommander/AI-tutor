@@ -1,0 +1,36 @@
+{
+  "name": "ai-for-kids",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI for Kids \u2014 a playful, safe platform where children aged 6-16 learn AI, coding, and creativity.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint && npm run check:images",
+    "typecheck": "tsc --noEmit",
+    "build:assets": "node scripts/build-assets.mjs",
+    "check:images": "node scripts/check-image-props.mjs --self-test && node scripts/check-image-props.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.3.0",
+    "lucide-react": "^0.453.0",
+    "next": "14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.15",
+    "postcss": "^8.4.47",
+    "sharp": "^0.35.3",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3"
+  }
+}

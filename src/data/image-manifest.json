@@ -1,0 +1,218 @@
+{
+  "brand/logo.webp": {
+    "source": "10.png",
+    "width": 560,
+    "height": 293,
+    "bytes": 45318
+  },
+  "brand/wordmark.webp": {
+    "source": "19.png",
+    "width": 640,
+    "height": 126,
+    "bytes": 32810
+  },
+  "brand/sparky-avatar.webp": {
+    "source": "18.png",
+    "width": 256,
+    "height": 255,
+    "bytes": 23804
+  },
+  "brand/sparky-tile.webp": {
+    "source": "17.png",
+    "width": 481,
+    "height": 512,
+    "bytes": 110774
+  },
+  "hero/children-tablet.webp": {
+    "source": "20.png",
+    "width": 875,
+    "height": 777,
+    "bytes": 221070
+  },
+  "hero/sparky.webp": {
+    "source": "16.png",
+    "width": 585,
+    "height": 895,
+    "bytes": 120290
+  },
+  "hero/planet.webp": {
+    "source": "9.png",
+    "width": 320,
+    "height": 208,
+    "bytes": 17378
+  },
+  "hero/spaceship.webp": {
+    "source": "8.png",
+    "width": 220,
+    "height": 400,
+    "bytes": 30418
+  },
+  "hero/castle.webp": {
+    "source": "7.png",
+    "width": 415,
+    "height": 440,
+    "bytes": 55870
+  },
+  "hero/cloud-small.webp": {
+    "source": "5.png",
+    "width": 600,
+    "height": 385,
+    "bytes": 65796
+  },
+  "hero/cloud-large.webp": {
+    "source": "6.png",
+    "width": 800,
+    "height": 508,
+    "bytes": 95064
+  },
+  "hero/sparkles.webp": {
+    "source": "4.png",
+    "width": 320,
+    "height": 283,
+    "bytes": 30146
+  },
+  "age-groups/explorer.webp": {
+    "source": "15.png",
+    "width": 307,
+    "height": 360,
+    "bytes": 42222
+  },
+  "age-groups/builder.webp": {
+    "source": "13.png",
+    "width": 360,
+    "height": 313,
+    "bytes": 46660
+  },
+  "age-groups/creator.webp": {
+    "source": "14.png",
+    "width": 360,
+    "height": 289,
+    "bytes": 40610
+  },
+  "features/sparky-tutor.webp": {
+    "source": "3.png",
+    "width": 226,
+    "height": 256,
+    "bytes": 21598
+  },
+  "features/code-lab.webp": {
+    "source": "2.png",
+    "width": 256,
+    "height": 184,
+    "bytes": 25808
+  },
+  "features/creative-studio.webp": {
+    "source": "1.png",
+    "width": 256,
+    "height": 238,
+    "bytes": 30538
+  },
+  "features/courses.webp": {
+    "source": "30.png",
+    "width": 256,
+    "height": 218,
+    "bytes": 28452
+  },
+  "safety/shield.webp": {
+    "source": "12.png",
+    "width": 256,
+    "height": 225,
+    "bytes": 23600
+  },
+  "safety/family.webp": {
+    "source": "11.png",
+    "width": 840,
+    "height": 541,
+    "bytes": 126190
+  },
+  "lessons/meet-sparky.webp": {
+    "source": "29.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 78310
+  },
+  "lessons/train-your-ai.webp": {
+    "source": "28.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 110974
+  },
+  "lessons/ai-art-studio.webp": {
+    "source": "27.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 86758
+  },
+  "lessons/smart-city.webp": {
+    "source": "26.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 80224
+  },
+  "courses/ai-ethics.webp": {
+    "source": "11.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 75852
+  },
+  "courses/data-science.webp": {
+    "source": "28.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 110974
+  },
+  "courses/vision-nlp.webp": {
+    "source": "2.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 94602
+  },
+  "courses/game-robotics.webp": {
+    "source": "26.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 80224
+  },
+  "stories/whispering-wood.webp": {
+    "source": "3.png",
+    "width": 720,
+    "height": 405,
+    "bytes": 47134
+  },
+  "footer/banner.webp": {
+    "source": "footer.png",
+    "width": 1400,
+    "height": 422,
+    "bytes": 193036
+  },
+  "rewards/gift.webp": {
+    "source": "21.png",
+    "width": 219,
+    "height": 256,
+    "bytes": 28294
+  },
+  "rewards/rocket-badge.webp": {
+    "source": "22.png",
+    "width": 234,
+    "height": 256,
+    "bytes": 28176
+  },
+  "rewards/trophy.webp": {
+    "source": "23.png",
+    "width": 256,
+    "height": 226,
+    "bytes": 30172
+  },
+  "rewards/xp-coin.webp": {
+    "source": "24.png",
+    "width": 256,
+    "height": 243,
+    "bytes": 28530
+  },
+  "rewards/level-star.webp": {
+    "source": "25.png",
+    "width": 256,
+    "height": 253,
+    "bytes": 36630
+  }
+}

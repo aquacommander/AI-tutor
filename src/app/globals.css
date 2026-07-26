@@ -1,0 +1,375 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Palette mirrors `tailwind.config.ts`. Tailwind utilities are the primary API;
+ * these variables exist for raw CSS (gradients, shadows, keyframes). Keep in sync.
+ */
+:root {
+  --background: #fff8f0;
+  --surface: #ffffff;
+  --parchment: #fdf2e3;
+
+  --text-primary: #2a1a47;
+  --text-secondary: #5f5266;
+  --text-muted: #6f6479;
+
+  --primary: #7148f5;
+  --primary-dark: #4c2bc6;
+  --primary-light: #eee9ff;
+
+  --sky-blue: #2498f5;
+  --sky-light: #dff3ff;
+
+  --green: #29b866;
+  --green-dark: #0f7440;
+  --green-light: #eaf9f1;
+
+  --coral: #ff6f66;
+  --coral-dark: #c2372d;
+  --coral-light: #fff0ec;
+
+  --yellow: #ffc83d;
+  --yellow-dark: #8f5c00;
+  --yellow-light: #fff7da;
+
+  --purple-surface: #f1edff;
+  --blue-surface: #edf6ff;
+  --mint-surface: #edf9f3;
+  --peach-surface: #fff1eb;
+
+  --border-soft: #ecddcd;
+
+  --radius-button: 999px;
+  --radius-card: 24px;
+  --radius-large: 32px;
+
+  /*
+   * Vertical space the floating header occupies in flow: its top gutter plus
+   * its own height. The hero pulls itself up by exactly this (`.hero-bleed`) so
+   * the sky reaches the very top of the page and the header floats over it,
+   * instead of a band of page background sitting above the artwork.
+   *
+   * If the header's padding or control heights change, change this too.
+   */
+  --header-offset: 5rem;
+
+  --shadow-card: 0 16px 40px rgba(90, 60, 30, 0.1);
+  --shadow-button: 0 10px 24px rgba(96, 65, 224, 0.25);
+}
+
+/**
+ * Metric-matched stand-in for Nunito Sans, used until the web font arrives.
+ * Overrides are derived from the Nunito Sans 12pt and Arial metrics:
+ *   size-adjust = (452/1000) / (913/2048)
+ *   ascent/descent = 1011 and 353, divided by 1000 x size-adjust
+ * See the note in `src/lib/fonts.ts`. Recompute if the body font changes.
+ */
+@font-face {
+  font-family: 'ai-kids-nunito-fallback';
+  src: local('Arial');
+  size-adjust: 101.39%;
+  ascent-override: 99.71%;
+  descent-override: 34.82%;
+  line-gap-override: 0%;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-offset: 5.25rem;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Reserve the sticky header height so in-page anchors are not hidden. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    color: var(--text-primary);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+
+    /*
+     * Two very soft warm pools over the cream base — one apricot from the top
+     * left, one honey from the right. `fixed` keeps them still while content
+     * scrolls past, so the page reads as if lit by a lamp just off-screen
+     * rather than as flat paint. They never repaint, so they cost nothing
+     * during scroll.
+     */
+    background-color: var(--background);
+    background-image:
+      radial-gradient(58rem 42rem at 8% -6%, rgba(255, 198, 148, 0.3), transparent 62%),
+      radial-gradient(48rem 38rem at 102% 18%, rgba(255, 224, 160, 0.28), transparent 60%),
+      radial-gradient(64rem 46rem at 50% 108%, rgba(255, 205, 175, 0.22), transparent 65%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  /*
+   * Stops the rubber-band overscroll from revealing a flat white strip past the
+   * warm background at the top and bottom of the page.
+   */
+  html {
+    background-color: var(--background);
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading), ui-rounded, system-ui, sans-serif;
+    color: var(--text-primary);
+  }
+
+  /* A single, consistently visible focus ring across the whole product. */
+  :focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Only suppress the ring for pointer users who did not tab here. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@layer components {
+  .hero-title {
+    /* Capped so the longest line ("Creativity, and") still fits the hero's
+       left column at 1440px without wrapping. */
+    font-size: clamp(2.5rem, 4.6vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  /*
+   * Lets a full-bleed section start at the true top of the page, underneath the
+   * floating header, rather than below it. The padding puts the section's own
+   * content back where it belongs.
+   */
+  .hero-bleed {
+    margin-top: calc(var(--header-offset) * -1);
+    padding-top: var(--header-offset);
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .body-large {
+    font-size: 1.125rem;
+    line-height: 1.65;
+  }
+
+  /*
+   * Reveal-on-scroll. `Reveal` adds `is-visible` once the element first enters
+   * the viewport, and then stops observing — content settles into place and
+   * stays there rather than re-animating every time it is scrolled past.
+   *
+   * Only `opacity` and `transform` are animated, both of which the compositor
+   * handles without touching layout or paint, so a long page stays smooth.
+   */
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    transition:
+      opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /*
+   * Storybook typography. Only used inside a tale, where a slower, more
+   * generous setting is the point — longer measure, larger type, an illuminated
+   * opening letter like a book of fairy tales.
+   */
+  .tale {
+    font-size: 1.1875rem;
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+
+  .tale > p + p {
+    margin-top: 1.25rem;
+  }
+
+  /* A scene heading needs air beneath it, or the prose crowds the title. */
+  .tale > h2 {
+    margin-bottom: 1.1rem;
+  }
+
+  /* Illuminated capital on the opening paragraph only. */
+  .tale > p:first-of-type::first-letter {
+    float: left;
+    margin: 0.32rem 0.65rem 0 0;
+    font-family: var(--font-heading), ui-rounded, system-ui, sans-serif;
+    font-size: 3.9rem;
+    font-weight: 600;
+    line-height: 0.78;
+    color: var(--primary-dark);
+  }
+
+  .tale-verse {
+    margin: 2rem auto;
+    max-width: 34rem;
+    text-align: center;
+    font-style: italic;
+    line-height: 1.75;
+    color: var(--primary-dark);
+  }
+
+  .tale-whisper {
+    margin-top: 2rem;
+    border-left: 3px solid var(--yellow);
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  /* Decorative scene divider — a small flourish between chapters. */
+  .tale-ornament {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 2.5rem 0 1.25rem;
+    color: var(--yellow);
+  }
+
+  .tale-ornament::before,
+  .tale-ornament::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(to right, transparent, var(--border-soft), transparent);
+  }
+
+  /*
+   * Reading progress for a long tale. Driven entirely by scroll position on the
+   * compositor — no scroll listener, no repaint per frame. Hidden outright
+   * where the timeline is unsupported, since a bar frozen at zero reads as a
+   * bug rather than a feature.
+   */
+  .reading-progress {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .reading-progress {
+      display: block;
+      transform-origin: 0 50%;
+      animation: reading-progress linear;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  @keyframes reading-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Skip link: off-screen until focused. */
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -100%;
+    z-index: 100;
+    border-radius: var(--radius-button);
+    background-color: var(--primary);
+    padding: 0.75rem 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+}
+
+/*
+ * Scroll-linked drift for decorative layers. `animation-timeline: view()` is
+ * driven by the compositor from scroll position, so it tracks the finger or
+ * wheel exactly in both directions with no JavaScript and no scroll listener.
+ *
+ * Browsers without support simply get the static layout — nothing to fall back
+ * to, nothing to ship. Never put content in here, only decoration.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .drift-slow,
+    .drift-fast {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    .drift-slow {
+      --drift-distance: 26px;
+    }
+
+    .drift-fast {
+      --drift-distance: 52px;
+    }
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, var(--drift-distance, 0), 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--drift-distance, 0) * -1), 0);
+  }
+}
+
+/*
+ * Users who ask their OS for less motion get a still page. Decorative
+ * animations are the only motion on the site, so removing them costs nothing.
+ *
+ * `.reveal` is reset explicitly rather than left to the blanket rule below:
+ * it starts at `opacity: 0`, and merely shortening its transition would leave
+ * anything not yet scrolled into view permanently invisible.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
