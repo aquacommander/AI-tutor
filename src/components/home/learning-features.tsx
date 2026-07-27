@@ -10,7 +10,6 @@ export function LearningFeatures() {
         <SectionHeading
           id="features-heading"
           title="Learn, Create, and Explore"
-          emoji="⭐"
           subtitle="Everything you need to become an AI explorer."
         />
 

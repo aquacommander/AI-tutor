@@ -24,7 +24,6 @@ export default function StoriesPage() {
               </p>
               <h1 className="section-title mt-3 font-heading font-bold">
                 Once upon an algorithm
-                <span aria-hidden="true"> 🪄</span>
               </h1>
               <p className="body-large mt-4 max-w-xl text-ink-soft">
                 Every tale here is a proper fairy tale — enchanted forests, clockwork birds,

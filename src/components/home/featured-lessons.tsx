@@ -52,7 +52,6 @@ export function FeaturedLessons() {
         <SectionHeading
           id="lessons-heading"
           title="Try a Fun Lesson"
-          emoji="⭐"
           subtitle="Jump into exciting activities and see what you can create!"
         />
 

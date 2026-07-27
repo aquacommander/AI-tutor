@@ -15,7 +15,6 @@ export function FeaturedStories() {
         <SectionHeading
           id="stories-heading"
           title="Once Upon an Algorithm"
-          emoji="🪄"
           subtitle="Fairy tales with a real AI idea hidden inside. Read one tonight — the lesson comes free."
         />
 
