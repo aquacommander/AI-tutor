@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react';
+import { hasScrolledPast, watchForOverscroll } from '@/lib/reveal-sweep';
 import { cn } from '@/lib/utils';
 
 interface RevealProps {
@@ -20,6 +21,11 @@ interface RevealProps {
  *
  * The observer disconnects after firing: the animation is a one-time settle,
  * not something that replays every time the section scrolls past.
+ *
+ * An observer alone is not enough — a fast scroll can carry an element from
+ * below the viewport to above it without the browser ever sampling it in view,
+ * leaving the content invisible for good. `watchForOverscroll` is the net that
+ * catches those; see `@/lib/reveal-sweep`.
  */
 export function Reveal({ children, delay = 0, as: Tag = 'div', className }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
@@ -35,14 +41,27 @@ export function Reveal({ children, delay = 0, as: Tag = 'div', className }: Reve
       return;
     }
 
+    // A restored scroll position or an anchor jump can land with the element
+    // already above the viewport, where it will never intersect again.
+    if (hasScrolledPast(element)) {
+      setIsVisible(true);
+      return;
+    }
+
+    let unwatch = () => {};
+
+    const settle = () => {
+      setIsVisible(true);
+      observer.disconnect();
+      unwatch();
+    };
+
     // Anything already on screen at load — the hero, mainly — settles in
     // immediately rather than waiting for a scroll that may never come.
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          setIsVisible(true);
-          observer.disconnect();
+          if (entry.isIntersecting) settle();
         }
       },
       // Fires a little before the element is fully in view, so the motion has
@@ -51,7 +70,12 @@ export function Reveal({ children, delay = 0, as: Tag = 'div', className }: Reve
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    unwatch = watchForOverscroll(element, settle);
+
+    return () => {
+      observer.disconnect();
+      unwatch();
+    };
   }, []);
 
   return (

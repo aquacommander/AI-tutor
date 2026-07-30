@@ -36,7 +36,12 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next-verify/types/**/*.ts",
-    ".next-dev-verify/types/**/*.ts"
+    ".next-dev-verify/types/**/*.ts",
+    ".next-check-api/types/**/*.ts",
+    ".next-quick/types/**/*.ts",
+    ".next-bundle-check/types/**/*.ts",
+    ".next-check-pages/types/**/*.ts",
+    ".next-check-live/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

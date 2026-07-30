@@ -23,6 +23,16 @@ export interface UseLearnerProgress {
   isLoaded: boolean;
   setAgeGroup: (ageGroup: AgeGroupId) => void;
   awardXp: (amount: number, activity: Omit<ActivityEntry, 'xpEarned' | 'occurredAt'>) => void;
+  /**
+   * Records a Code Lab challenge and pays out its XP in a single write.
+   * Returns false if it was already complete, so re-checking a solved
+   * challenge cannot be farmed for XP.
+   */
+  completeChallenge: (
+    challengeId: string,
+    xp: number,
+    activity: Omit<ActivityEntry, 'xpEarned' | 'occurredAt'>,
+  ) => boolean;
   reset: () => void;
 }
 
@@ -79,7 +89,35 @@ export function useLearnerProgress(): UseLearnerProgress {
     });
   }, []);
 
+  const completeChallenge = useCallback<UseLearnerProgress['completeChallenge']>(
+    (challengeId, xp, activity) => {
+      const current = getLearnerSnapshot();
+      if (!current || current.completedChallenges.includes(challengeId)) return false;
+
+      // One write rather than "mark complete, then award XP": two writes would
+      // notify subscribers twice and briefly render a solved challenge worth
+      // nothing.
+      const currentXp = current.progress.currentXp + Math.max(0, xp);
+      const { level, nextLevelXp } = levelFromXp(currentXp, current.ageGroup);
+      const occurredAt = new Date().toISOString();
+
+      writeLearnerState({
+        ...current,
+        completedChallenges: [...current.completedChallenges, challengeId],
+        progress: { ...current.progress, currentXp, level, nextLevelXp },
+        recentActivity: [
+          { ...activity, xpEarned: xp, occurredAt },
+          ...current.recentActivity,
+        ].slice(0, MAX_ACTIVITY_ENTRIES),
+        lastActivityAt: occurredAt,
+      });
+
+      return true;
+    },
+    [],
+  );
+
   const reset = useCallback(() => clearLearnerState(), []);
 
-  return { learner, isLoaded, setAgeGroup, awardXp, reset };
+  return { learner, isLoaded, setAgeGroup, awardXp, completeChallenge, reset };
 }

@@ -64,7 +64,10 @@ export function DashboardContent() {
   const moduleProgress: Record<string, number> = {
     tutor: recentActivity.some((entry) => entry.id.startsWith('tutor')) ? 1 : 0,
     code: completedChallenges.length,
-    create: recentActivity.filter((entry) => entry.id.startsWith('create')).length,
+    // Counted by distinct tool, so using Story Weaver twice is not "2 of 3".
+    create: new Set(
+      recentActivity.filter((entry) => entry.id.startsWith('create')).map((entry) => entry.id),
+    ).size,
     courses: completedLessons.length,
   };
 

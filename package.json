@@ -2,23 +2,35 @@
   "name": "ai-for-kids",
   "version": "1.0.0",
   "private": true,
-  "description": "AI for Kids \u2014 a playful, safe platform where children aged 6-16 learn AI, coding, and creativity.",
+  "description": "AI for Kids — a playful, safe platform where children aged 6-16 learn AI, coding, and creativity.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint && npm run check:images",
+    "lint": "next lint && npm run check:units",
     "typecheck": "tsc --noEmit",
     "build:assets": "node scripts/build-assets.mjs",
-    "check:images": "node scripts/check-image-props.mjs --self-test && node scripts/check-image-props.mjs"
+    "check:images": "node scripts/check-image-props.mjs --self-test && node scripts/check-image-props.mjs",
+    "check:safety": "node scripts/check-safety.mjs",
+    "check:output": "node scripts/check-output-safety.mjs",
+    "check:challenges": "node scripts/check-challenges.mjs",
+    "check:reveal": "node scripts/check-reveal.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs --self-test && node scripts/check-bundle.mjs",
+    "check:api": "node scripts/check-tutor-api.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
+    "check:live": "node scripts/check-live-ai.mjs",
+    "check:units": "npm run check:images && npm run check:safety && npm run check:output && npm run check:challenges && npm run check:reveal",
+    "check": "npm run typecheck && npm run lint && npm run check:pages && npm run check:api && npm run check:bundle"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.3.0",
     "lucide-react": "^0.453.0",
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {

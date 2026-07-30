@@ -97,12 +97,18 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(12px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        // The three dots that show Sparky is composing a reply.
+        thinking: {
+          '0%, 80%, 100%': { opacity: '0.3', transform: 'translateY(0)' },
+          '40%': { opacity: '1', transform: 'translateY(-4px)' },
+        },
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
         'float-slow': 'float 9s ease-in-out infinite',
         twinkle: 'twinkle 3.5s ease-in-out infinite',
         'fade-up': 'fade-up 0.5s ease-out both',
+        thinking: 'thinking 1.2s ease-in-out infinite',
       },
     },
   },
