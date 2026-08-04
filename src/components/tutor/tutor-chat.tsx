@@ -70,11 +70,15 @@ export function TutorChat() {
       // sending a lot of messages.
       if (!hasAwarded.current) {
         hasAwarded.current = true;
-        awardXp(TUTOR_XP, {
-          id: 'tutor-chat',
-          label: 'Asked Sparky a question',
-          detail: 'Started a conversation with the AI tutor',
-        });
+        awardXp(
+          TUTOR_XP,
+          {
+            id: 'tutor-chat',
+            label: 'Asked Sparky a question',
+            detail: 'Started a conversation with the AI tutor',
+          },
+          ['curious-mind'],
+        );
       }
     },
     [awardXp, messages, send, status],

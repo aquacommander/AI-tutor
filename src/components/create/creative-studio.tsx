@@ -61,11 +61,23 @@ export function CreativeStudio() {
     // pressing the button repeatedly.
     if (!awarded.current.has(tool.id)) {
       awarded.current.add(tool.id);
-      awardXp(tool.xpReward, {
-        id: `create-${tool.id}`,
-        label: `Used the ${tool.title}`,
-        detail: 'Made something in the Creative Studio',
-      });
+
+      const badgeIds = tool.id === 'story' ? ['story-weaver'] : [];
+      // Super Creator is for using all three tools, so it is checked against
+      // what has ever been made, not just this visit.
+      if (studioTools.every((item) => results[item.id] || item.id === tool.id)) {
+        badgeIds.push('super-creator');
+      }
+
+      awardXp(
+        tool.xpReward,
+        {
+          id: `create-${tool.id}`,
+          label: `Used the ${tool.title}`,
+          detail: 'Made something in the Creative Studio',
+        },
+        badgeIds,
+      );
     }
   };
 

@@ -2,7 +2,7 @@
   "name": "ai-for-kids",
   "version": "1.0.0",
   "private": true,
-  "description": "AI for Kids — a playful, safe platform where children aged 6-16 learn AI, coding, and creativity.",
+  "description": "AI for Kids \u2014 a playful, safe platform where children aged 6-16 learn AI, coding, and creativity.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,13 +14,15 @@
     "check:safety": "node scripts/check-safety.mjs",
     "check:output": "node scripts/check-output-safety.mjs",
     "check:challenges": "node scripts/check-challenges.mjs",
+    "check:curriculum": "node scripts/check-curriculum.mjs",
     "check:reveal": "node scripts/check-reveal.mjs",
     "check:bundle": "node scripts/check-bundle.mjs --self-test && node scripts/check-bundle.mjs",
     "check:api": "node scripts/check-tutor-api.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:live": "node scripts/check-live-ai.mjs",
-    "check:units": "npm run check:images && npm run check:safety && npm run check:output && npm run check:challenges && npm run check:reveal",
-    "check": "npm run typecheck && npm run lint && npm run check:pages && npm run check:api && npm run check:bundle"
+    "check:units": "npm run check:images && npm run check:safety && npm run check:output && npm run check:challenges && npm run check:curriculum && npm run check:reveal",
+    "check": "npm run typecheck && npm run lint && npm run check:pages && npm run check:api && npm run check:bundle",
+    "build:video": "node scripts/build-video.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

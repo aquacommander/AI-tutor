@@ -6,17 +6,37 @@ Built with Next.js 14 (App Router), TypeScript in strict mode, and Tailwind CSS.
 
 ---
 
-## Status: Milestone 1 complete
+## Status: Milestone 2 complete, Milestone 3 under way
 
 | Milestone | Days | Scope | State |
 | --- | --- | --- | --- |
 | 1 | 1-5 | Repo, design system, landing page, age selection, dashboard, responsive foundation | **Done** |
-| 2 | 6-10 | Sparky AI Tutor, Claude integration, safety controls, Code Lab, Creative Studio | Not started |
-| 3 | 11-15 | Course library, lessons, quizzes, XP and badges, testing, Vercel deploy | Not started |
+| 2 | 6-10 | Sparky AI Tutor, Claude integration, safety controls, Code Lab, Creative Studio | **Done** |
+| 3 | 11-15 | Course library, lessons, quizzes, XP and badges, testing, Vercel deploy | In progress |
 
-Routes for Milestone 2 and 3 features already exist and render an honest
-"arriving in Milestone N" page listing what each will contain, so no navigation
-link is ever a dead end.
+Milestone 3 progress: the course system is built and **Course 1 (AI Detective
+Academy) is fully transcribed** — five lessons, quizzes, badges and XP. Courses
+2-4 are declared with their real titles and outcomes but marked `coming-soon`
+until their lessons are imported. Still outstanding: streak tracking, a
+delete-my-data control, real test framework, CI, and the Vercel deploy.
+
+Pages that are genuinely not built yet render an honest "arriving in Milestone
+N" page listing what each will contain, so no navigation link is a dead end.
+
+### Course content
+
+Lesson content is transcribed from `AI_for_Kids_Complete_Course_Material.docx`
+by the importer in `scripts/curriculum/`, not typed by hand:
+
+```bash
+python3 scripts/curriculum/parse-curriculum.py 1 > /tmp/course1.json
+python3 scripts/curriculum/generate-course.py /tmp/course1.json > src/data/courses/<slug>.ts
+npm run check:curriculum      # asserts every quiz is answerable
+```
+
+`check:curriculum` is the guard that matters: a quiz whose correct answer is not
+among its own options is unanswerable, and that is exactly the sort of mistake a
+bulk import makes silently.
 
 ---
 
