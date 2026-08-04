@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/enchanted-card';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { badges } from '@/data/badges';
-import { courseSummaries } from '@/data/courses';
+import { courses, courseSummaries } from '@/data/courses';
 import { dailyChallenges } from '@/data/daily-challenges';
 import { learningFeatures } from '@/data/homepage-features';
 import { useLearnerProgress } from '@/hooks/use-learner-progress';
@@ -25,12 +25,21 @@ import { AGE_GROUP_LABEL, AGE_GROUP_RANGE, ROUTES } from '@/lib/constants';
 import { img } from '@/lib/images';
 import { cn, formatNumber, relativeTime } from '@/lib/utils';
 
-/** Total items a module contains, used to turn completion counts into percentages. */
+/**
+ * Denominators for the module progress bars.
+ *
+ * `courses` counts the lessons that are actually **playable**, not the twenty
+ * the finished programme will have. Finishing everything available and still
+ * reading "5 of 20" tells a child they have barely started when in fact they
+ * have done the lot.
+ */
 const MODULE_TOTALS: Record<string, number> = {
   tutor: 1,
   code: 5,
   create: 3,
-  courses: 20,
+  courses: courses
+    .filter((course) => course.status === 'available')
+    .reduce((total, course) => total + course.lessons.length, 0),
 };
 
 export function DashboardContent() {

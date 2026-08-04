@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { ArrowRight, Lightbulb, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { CHARACTERS } from '@/data/characters';
 import { formatDuration } from '@/lib/lesson-time';
 import { cn } from '@/lib/utils';
 import type { Lesson, LessonVideo } from '@/types/course';
@@ -148,7 +149,7 @@ export function LessonVideoPlayer({ video, lesson, onWatched }: LessonVideoPlaye
         <Card role="status" className="border-primary bg-primary-surface">
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-dark">
             <Lightbulb className="size-4" aria-hidden="true" />
-            Pip has stopped the film — your turn to think
+            {CHARACTERS.tutor.name} has stopped the film — your turn to think
           </p>
           <p className="mt-3 text-lg leading-relaxed sm:text-xl">
             {promptFor(lesson, activePause)}
@@ -206,7 +207,9 @@ export function LessonVideoPlayer({ video, lesson, onWatched }: LessonVideoPlaye
               {scene.turns.map((turn, index) => (
                 <p key={index} className="mt-1 leading-relaxed">
                   {turn.speaker === 'glitch' ? (
-                    <span className="font-heading font-bold text-coral-dark">Glitch: </span>
+                    <span className="font-heading font-bold text-coral-dark">
+                      {CHARACTERS.glitch.name}:{' '}
+                    </span>
                   ) : null}
                   {turn.text}
                 </p>

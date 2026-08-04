@@ -12,13 +12,14 @@ import { Card } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { findActivityGame, type ActivityGame } from '@/data/activities';
 import { findBadge } from '@/data/badges';
+import { CHARACTERS, PIP } from '@/data/characters';
 import { findLessonVideo } from '@/data/lesson-videos';
 import { useLearnerProgress, type LessonReward } from '@/hooks/use-learner-progress';
 import { AGE_GROUP_LABEL, AGE_GROUP_RANGE, ROUTES } from '@/lib/constants';
 import { img } from '@/lib/images';
 import { lessonTime, stageTime, videoMinutes } from '@/lib/lesson-time';
 import { cn } from '@/lib/utils';
-import type { Course, Lesson, LessonScene, LessonVideo } from '@/types/course';
+import type { Course, Lesson, LessonScene, LessonVideo, Speaker } from '@/types/course';
 
 /**
  * A lesson, one step at a time.
@@ -103,7 +104,7 @@ type Step =
  */
 function stageLabel(name: string, hasVideo: boolean): string {
   if (name !== 'Lesson video') return name;
-  return hasVideo ? 'Watch the film' : 'Story time with Pip';
+  return hasVideo ? 'Watch the film' : `Story time with ${CHARACTERS.tutor.name}`;
 }
 
 const STAGE_EMOJI = ['📖', '🧩', '🚀', '🧠'];
@@ -405,6 +406,27 @@ function PlanStep({
         </p>
       </div>
 
+      <div className="mt-7">
+        <h3 className="text-center font-heading text-lg font-bold">Who you will meet</h3>
+        <ul className="mt-3 flex flex-wrap justify-center gap-3">
+          {[CHARACTERS.tutor, PIP, CHARACTERS.glitch].map((character) => (
+            <li
+              key={character.name}
+              className="flex items-center gap-2 rounded-button border-2 border-border-soft bg-surface py-1.5 pl-1.5 pr-4"
+            >
+              <Image
+                {...img(character.avatar)}
+                alt=""
+                aria-hidden="true"
+                sizes="56px"
+                className="size-10 rounded-full bg-primary-surface object-cover"
+              />
+              <span className="font-heading font-bold">{character.name}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <h3 className="mt-7 text-center font-heading text-lg font-bold">Here is the plan</h3>
 
       <ol className="mt-4 space-y-3">
@@ -441,27 +463,31 @@ function PlanStep({
 }
 
 /** A speech bubble with the character who is talking. */
-function Bubble({ speaker, children }: { speaker: 'tutor' | 'glitch'; children: React.ReactNode }) {
+function Bubble({
+  speaker,
+  showName = true,
+  children,
+}: {
+  speaker: Speaker;
+  /** Only the first bubble of a run is named; repeating it every time reads oddly. */
+  showName?: boolean;
+  children: React.ReactNode;
+}) {
   const isGlitch = speaker === 'glitch';
+  const character = CHARACTERS[speaker];
 
   return (
     <div className="flex items-start gap-3">
-      {isGlitch ? (
-        <span
-          aria-hidden="true"
-          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-coral/20 text-2xl"
-        >
-          🐞
-        </span>
-      ) : (
-        <Image
-          {...img('brand/sparky-avatar.webp')}
-          alt=""
-          aria-hidden="true"
-          sizes="64px"
-          className="size-12 shrink-0 rounded-full bg-primary-surface object-contain p-0.5"
-        />
-      )}
+      <Image
+        {...img(character.avatar)}
+        alt=""
+        aria-hidden="true"
+        sizes="64px"
+        className={cn(
+          'size-12 shrink-0 rounded-full object-cover',
+          isGlitch ? 'bg-coral/20' : 'bg-primary-surface',
+        )}
+      />
 
       <p
         className={cn(
@@ -469,7 +495,16 @@ function Bubble({ speaker, children }: { speaker: 'tutor' | 'glitch'; children: 
           isGlitch ? 'bg-coral/10 text-ink' : 'bg-primary-surface text-ink',
         )}
       >
-        {isGlitch ? <span className="font-heading font-bold text-coral-dark">Glitch: </span> : null}
+        {showName ? (
+          <span
+            className={cn(
+              'font-heading font-bold',
+              isGlitch ? 'text-coral-dark' : 'text-primary-dark',
+            )}
+          >
+            {character.name}:{' '}
+          </span>
+        ) : null}
         {children}
       </p>
     </div>
@@ -514,7 +549,7 @@ function SceneStep({
         {scene.isPause ? (
           <>
             {bubbles(prompt).map((text, i) => (
-              <Bubble key={i} speaker="tutor">
+              <Bubble key={i} speaker="tutor" showName={i === 0}>
                 {text}
               </Bubble>
             ))}
@@ -522,7 +557,7 @@ function SceneStep({
             {reveal ? (
               revealed ? (
                 bubbles(reveal).map((text, i) => (
-                  <Bubble key={`r${i}`} speaker="tutor">
+                  <Bubble key={`r${i}`} speaker="tutor" showName={i === 0}>
                     {text}
                   </Bubble>
                 ))
@@ -543,7 +578,7 @@ function SceneStep({
         ) : (
           scene.turns.flatMap((turn, turnIndex) =>
             bubbles(turn.text).map((text, i) => (
-              <Bubble key={`${turnIndex}-${i}`} speaker={turn.speaker}>
+              <Bubble key={`${turnIndex}-${i}`} speaker={turn.speaker} showName={i === 0}>
                 {text}
               </Bubble>
             )),

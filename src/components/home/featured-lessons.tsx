@@ -1,11 +1,13 @@
 'use client';
 
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { featuredLessons } from '@/data/featured-lessons';
+import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { LessonCard } from './lesson-card';
 
@@ -99,6 +101,15 @@ export function FeaturedLessons() {
             onClick={scrollNext}
             className="right-1 lg:right-0 lg:translate-x-1/2"
           />
+        </div>
+
+        {/* The cards deep-link to individual lessons; this is the way into the
+            course itself, which nothing on the homepage used to offer. */}
+        <div className="mt-4 flex justify-center">
+          <ButtonLink href={ROUTES.courses} variant="secondary" size="md">
+            See all the courses
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </ButtonLink>
         </div>
       </Container>
     </section>

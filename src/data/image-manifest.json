@@ -214,5 +214,23 @@
     "width": 256,
     "height": 253,
     "bytes": 36630
+  },
+  "characters/maya.webp": {
+    "source": "Picture Clue Patrol.mp4",
+    "width": 256,
+    "height": 256,
+    "bytes": 9536
+  },
+  "characters/pip.webp": {
+    "source": "Picture Clue Patrol.mp4",
+    "width": 256,
+    "height": 256,
+    "bytes": 9482
+  },
+  "characters/glitch.webp": {
+    "source": "Picture Clue Patrol.mp4",
+    "width": 256,
+    "height": 256,
+    "bytes": 7652
   }
 }
