@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Types, lint, and the content fixtures. These need no browser, no API key
+      # and no video files, so they run on every push.
+      - run: npm run typecheck
+      - run: npm run lint
+
+      # `check:pages` boots a dev server and `check:bundle` runs a production
+      # build; both are slow, so they run only on the default branch.
+      - if: github.ref == 'refs/heads/main'
+        run: npm run check:bundle

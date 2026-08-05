@@ -232,5 +232,89 @@
     "width": 256,
     "height": 256,
     "bytes": 7652
+  },
+  "lesson-posters/picture-clue-patrol.webp": {
+    "source": "picture-clue-patrol.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 43128
+  },
+  "lesson-posters/sound-safari.webp": {
+    "source": "sound-safari.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 23272
+  },
+  "lesson-posters/creative-clues.webp": {
+    "source": "creative-clues.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 26044
+  },
+  "lesson-posters/glitch-hunt.webp": {
+    "source": "glitch-hunt.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 25132
+  },
+  "lesson-posters/ai-detective.webp": {
+    "source": "ai-detective.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 24552
+  },
+  "lesson-posters/feature-find.webp": {
+    "source": "feature-find.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 36406
+  },
+  "lesson-posters/data-kitchen.webp": {
+    "source": "data-kitchen.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 14872
+  },
+  "lesson-posters/mood-mixer.webp": {
+    "source": "mood-mixer.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 22254
+  },
+  "lesson-posters/robot-brain.webp": {
+    "source": "robot-brain.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 44656
+  },
+  "lesson-posters/game-hero.webp": {
+    "source": "game-hero.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 36938
+  },
+  "lesson-posters/choice-engine.webp": {
+    "source": "choice-engine.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 22372
+  },
+  "lesson-posters/maze-mission.webp": {
+    "source": "maze-mission.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 32632
+  },
+  "lesson-posters/privacy-mission.webp": {
+    "source": "privacy-mission.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 27134
+  },
+  "lesson-posters/truth-tracker.webp": {
+    "source": "truth-tracker.mp4",
+    "width": 960,
+    "height": 540,
+    "bytes": 26330
   }
 }

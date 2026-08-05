@@ -30,14 +30,20 @@ const ROUTES = [
   ['/courses', 'AI Courses'],
   ['/courses/ai-detective-academy', 'Missions'],
   ['/courses/ai-detective-academy/picture-clue-patrol', 'Picture Clue Patrol'],
-  ['/courses/ai-detective-academy/build-the-picture-detective', 'Chief AI Detective'],
-  // A course whose lessons are not transcribed yet must say so, not 404.
-  ['/courses/train-your-robot-brain', 'Train Your Robot Brain'],
+  ['/courses/ai-detective-academy/capstone', 'Mystery Media Lab'],
+  ['/courses/train-your-robot-brain/mood-mixer', 'Mood Mixer'],
+  ['/courses/ai-game-creator-lab/maze-mission', 'Maze Mission'],
+  ['/courses/smart-and-safe-ai-heroes/truth-tracker', 'Truth Tracker'],
+  ['/courses/smart-and-safe-ai-heroes/capstone', 'Digital Safety Newsroom'],
   ['/stories', 'Stories'],
   ['/stories/the-lantern-that-learned-the-way', 'Lantern'],
-  ['/for-parents', 'Parents'],
-  ['/privacy', 'Privacy'],
-  ['/about', 'About'],
+  ['/for-parents', 'Erase everything'],
+  ['/privacy', 'pending legal review'],
+  ['/about', 'What we think matters'],
+  ['/certificate', 'certificate'],
+  ['/courses/ai-detective-academy/picture-clue-patrol/sheet', 'answer key'],
+  ['/sitemap.xml', '/courses/ai-detective-academy'],
+  ['/robots.txt', 'Sitemap'],
 ];
 
 let failures = 0;

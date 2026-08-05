@@ -20,8 +20,10 @@ export const ROUTES = {
   create: '/create',
   courses: '/courses',
   stories: '/stories',
+  certificate: '/certificate',
   parents: '/for-parents',
   about: '/about',
+  privacy: '/privacy',
 } as const;
 
 export interface NavChild {

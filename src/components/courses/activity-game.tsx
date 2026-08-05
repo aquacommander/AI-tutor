@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { playSound } from '@/lib/sound';
+import { useShuffleNonce } from '@/hooks/use-shuffle';
+import { seededShuffle } from '@/lib/shuffle';
 import { cn } from '@/lib/utils';
-import type { ActivityGame, GameRound, RoundVisual, Treatment } from '@/data/activities';
+import type { ActivityGame, RoundVisual, Treatment } from '@/types/activity';
 
 /**
  * The playable guided activity.
@@ -30,6 +32,8 @@ const TREATMENT: Record<Treatment, string> = {
   dim: 'brightness-[0.35] contrast-75',
   // Half the picture is hidden, so shape has to carry the decision.
   peek: '[clip-path:inset(0_50%_0_0)]',
+  // Drawn as an overlay by the caller, not as a filter.
+  costume: '',
 };
 
 interface ActivityGameViewProps {
@@ -43,8 +47,10 @@ export function ActivityGameView({ game, onFinish }: ActivityGameViewProps) {
   const [correct, setCorrect] = useState(0);
   const [showClue, setShowClue] = useState(false);
   const [done, setDone] = useState(false);
+  const { nonce, reshuffle } = useShuffleNonce();
 
   const round = game.rounds[index];
+  const options = round ? seededShuffle(round.options, `${round.id}:${nonce}`) : [];
   const isLast = index === game.rounds.length - 1;
 
   if (!round) return null;
@@ -71,6 +77,7 @@ export function ActivityGameView({ game, onFinish }: ActivityGameViewProps) {
     setCorrect(0);
     setShowClue(false);
     setDone(false);
+    reshuffle();
   };
 
   if (done) {
@@ -140,7 +147,7 @@ export function ActivityGameView({ game, onFinish }: ActivityGameViewProps) {
       ) : null}
 
       <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-        {round.options.map((option) => {
+        {options.map((option) => {
           const picked = chosen === option.id;
           const reveal = chosen !== null && option.id === round.answer;
 
@@ -194,7 +201,7 @@ export function ActivityGameView({ game, onFinish }: ActivityGameViewProps) {
           </p>
           <p className="mt-2 text-lg leading-relaxed">{round.explanation}</p>
           <Button size="lg" onClick={advance} className="mt-4 w-full">
-            {isLast ? 'Finish the activity' : 'Next picture'}
+            {isLast ? 'Finish the activity' : 'Next'}
             <ArrowRight className="size-5" aria-hidden="true" />
           </Button>
         </div>

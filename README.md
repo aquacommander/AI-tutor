@@ -6,35 +6,54 @@ Built with Next.js 14 (App Router), TypeScript in strict mode, and Tailwind CSS.
 
 ---
 
-## Status: Milestone 2 complete, Milestone 3 under way
+## Status
 
 | Milestone | Days | Scope | State |
 | --- | --- | --- | --- |
 | 1 | 1-5 | Repo, design system, landing page, age selection, dashboard, responsive foundation | **Done** |
 | 2 | 6-10 | Sparky AI Tutor, Claude integration, safety controls, Code Lab, Creative Studio | **Done** |
-| 3 | 11-15 | Course library, lessons, quizzes, XP and badges, testing, Vercel deploy | In progress |
+| 3 | 11-15 | Course library, lessons, quizzes, XP and badges, testing, Vercel deploy | Content done; deploy outstanding |
 
-Milestone 3 progress: the course system is built and **Course 1 (AI Detective
-Academy) is fully transcribed** — five lessons, quizzes, badges and XP. Courses
-2-4 are declared with their real titles and outcomes but marked `coming-soon`
-until their lessons are imported. Still outstanding: streak tracking, a
-delete-my-data control, real test framework, CI, and the Vercel deploy.
+All four courses are built from `AI_for_Kids_Revised_14_Video_Course_Plan.docx`:
+**14 lessons across 4 courses (5/4/3/2)**, 23:48 of film, 14 playable guided
+activities, 14 playable independent missions, 70 quiz questions, 4 capstone
+projects, 28 badges and a printable certificate.
 
-Pages that are genuinely not built yet render an honest "arriving in Milestone
-N" page listing what each will contain, so no navigation link is a dead end.
+### Outstanding
+
+Needs somebody other than the code:
+
+- **Subtitles** — 0 of 14 films have a WebVTT track
+- **Legal review** of the privacy notice, which ships as a clearly-marked draft
+- **Tutor sign-off** on the seven release checks in the plan, especially the
+  quiz distractors and age adaptations, which were authored here rather than
+  parsed from the document
+- **Artwork** — the 25 lesson illustrations, an approved animal image library,
+  and real audio files. Activities currently use emoji and synthesised sound
+- **Hosting** — 138 MB of film sits in `public/videos/` and needs a CDN before
+  launch; `npm run build:video` produces an HLS ladder when you are ready
+- **Vercel deploy** and a real test framework (verification is currently 226
+  assertions across `scripts/*.mjs`)
+
+---
 
 ### Course content
 
-Lesson content is transcribed from `AI_for_Kids_Complete_Course_Material.docx`
-by the importer in `scripts/curriculum/`, not typed by hand:
+Lesson content is generated from the Word document, not typed by hand:
 
 ```bash
-python3 scripts/curriculum/parse-curriculum.py 1 > /tmp/course1.json
-python3 scripts/curriculum/generate-course.py /tmp/course1.json > src/data/courses/<slug>.ts
-npm run check:curriculum      # asserts every quiz is answerable
+python3 scripts/curriculum/parse-revised.py > revised.json
+python3 scripts/curriculum/generate-courses.py revised.json
+npm run check:curriculum
 ```
 
-`check:curriculum` is the guard that matters: a quiz whose correct answer is not
+Two files in `scripts/curriculum/` are **authored rather than parsed**, because
+the plan does not contain them: `distractors.json` (the wrong answers, which the
+plan's own checklist says must each reveal a real misconception) and
+`child-missions.json` (the independent missions rewritten in the second person —
+the plan phrases them as instructions to the tutor).
+
+`check:curriculum` is the guard that matters. A quiz whose correct answer is not
 among its own options is unanswerable, and that is exactly the sort of mistake a
 bulk import makes silently.
 

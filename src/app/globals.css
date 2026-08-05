@@ -373,3 +373,22 @@
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Printing.
+ *
+ * The certificate is meant to go on a wall, so a print keeps the certificate
+ * and drops the chrome around it — header, footer, navigation and buttons.
+ */
+@media print {
+  header,
+  footer,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+}

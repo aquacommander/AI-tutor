@@ -2,19 +2,18 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Check, Circle, Target } from 'lucide-react';
+import { ArrowRight, Check, Clock, Lock, Target } from 'lucide-react';
 import { Badge, DifficultyBadge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { ProgressBar } from '@/components/ui/progress-bar';
-import { courseTotalXp } from '@/data/courses';
+import { courseTotalXp, courseVideoSeconds } from '@/data/courses';
 import { findBadge } from '@/data/badges';
-import { findLessonVideo } from '@/data/lesson-videos';
 import { useLearnerProgress } from '@/hooks/use-learner-progress';
 import { ROUTES } from '@/lib/constants';
 import { img } from '@/lib/images';
-import { courseTime, lessonTime } from '@/lib/lesson-time';
+import { courseTime, formatDuration } from '@/lib/lesson-time';
 import { cn } from '@/lib/utils';
 import type { Course } from '@/types/course';
 
@@ -24,10 +23,14 @@ export function CourseDetail({ course }: { course: Course }) {
 
   const isDone = (lessonId: string) => completed.includes(`${course.id}/${lessonId}`);
   const doneCount = course.lessons.filter((lesson) => isDone(lesson.id)).length;
+  const capstoneDone = completed.includes(`capstone:${course.id}`);
 
-  // Continue where they stopped, rather than always restarting at lesson one.
-  const nextLesson = course.lessons.find((lesson) => !isDone(lesson.id)) ?? course.lessons[0];
-  const courseBadge = findBadge(course.badgeId);
+  // Everything counts toward the bar, capstone included — it is a real stage.
+  const totalSteps = course.lessons.length + 1;
+  const doneSteps = doneCount + (capstoneDone ? 1 : 0);
+
+  const nextLesson = course.lessons.find((lesson) => !isDone(lesson.id));
+  const capstoneBadge = findBadge(course.capstone.badgeId);
 
   return (
     <Container className="space-y-8 pb-6">
@@ -40,6 +43,7 @@ export function CourseDetail({ course }: { course: Course }) {
       <header className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,220px)] md:items-center">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="neutral">Course {course.number}</Badge>
             <DifficultyBadge difficulty={course.difficulty} />
             {course.topics.map((topic) => (
               <Badge key={topic} tone="purple">
@@ -52,18 +56,14 @@ export function CourseDetail({ course }: { course: Course }) {
           <p className="body-large mt-2 text-ink-soft">{course.tagline}</p>
 
           <p className="mt-3 text-sm font-bold text-ink-muted">
-            {course.lessons.length} lessons · {courseTotalXp(course)} XP · about{' '}
-            {courseTime(course.lessons, (entry) => findLessonVideo(course.id, entry.id))}
+            {course.lessons.length} missions · {formatDuration(courseVideoSeconds(course))} of film ·{' '}
+            {courseTotalXp(course)} XP · about {courseTime(course)}
           </p>
 
           <div className="mt-5 max-w-sm">
-            <ProgressBar
-              value={doneCount}
-              max={course.lessons.length}
-              label={`${course.title} progress`}
-            />
+            <ProgressBar value={doneSteps} max={totalSteps} label={`${course.title} progress`} />
             <p className="mt-1.5 text-sm font-semibold text-ink-muted">
-              {doneCount} of {course.lessons.length} missions complete
+              {doneSteps} of {totalSteps} complete, including the final project
             </p>
           </div>
 
@@ -73,14 +73,15 @@ export function CourseDetail({ course }: { course: Course }) {
               size="lg"
               className="mt-5"
             >
-              {doneCount === 0
-                ? 'Start the first mission'
-                : doneCount === course.lessons.length
-                  ? 'Revisit a mission'
-                  : 'Continue where you left off'}
+              {doneCount === 0 ? 'Start the first mission' : 'Continue where you left off'}
               <ArrowRight className="size-5" aria-hidden="true" />
             </ButtonLink>
-          ) : null}
+          ) : (
+            <ButtonLink href={`${ROUTES.courses}/${course.id}/capstone`} size="lg" className="mt-5">
+              {capstoneDone ? 'Revisit the final project' : 'Start the final project'}
+              <ArrowRight className="size-5" aria-hidden="true" />
+            </ButtonLink>
+          )}
         </div>
 
         <Image
@@ -126,7 +127,9 @@ export function CourseDetail({ course }: { course: Course }) {
                     'flex flex-wrap items-center gap-4 rounded-card border p-4 shadow-card',
                     'transition-[transform,border-color,box-shadow] duration-200',
                     'hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:hover:translate-y-0',
-                    done ? 'border-grass bg-grass-light' : 'border-border-soft bg-surface hover:border-primary/40',
+                    done
+                      ? 'border-grass bg-grass-light'
+                      : 'border-border-soft bg-surface hover:border-primary/40',
                   )}
                 >
                   <span
@@ -141,14 +144,13 @@ export function CourseDetail({ course }: { course: Course }) {
                   <span className="min-w-0 flex-1">
                     <span className="block font-heading font-bold">{lesson.title}</span>
                     <span className="mt-0.5 flex items-center gap-1.5 text-sm text-ink-soft">
-                      <Target className="size-3.5 shrink-0" aria-hidden="true" />
-                      {lesson.mission}
+                      <Clock className="size-3.5 shrink-0" aria-hidden="true" />
+                      {formatDuration(lesson.video.durationSeconds)} film · {lesson.learnerTime} in
+                      total
                     </span>
                     {/* State is spelled out, never signalled by colour alone. */}
                     <span className="mt-1 block text-xs font-semibold text-ink-muted">
-                      {done ? 'Complete' : 'Not started'} ·{' '}
-                      {lessonTime(lesson, findLessonVideo(course.id, lesson.id))} · +
-                      {lesson.xpReward} XP
+                      {done ? 'Complete' : 'Not started'} · +{lesson.xpReward} XP
                     </span>
                   </span>
 
@@ -167,19 +169,44 @@ export function CourseDetail({ course }: { course: Course }) {
         </ol>
       </section>
 
-      {courseBadge ? (
-        <Card className="flex flex-wrap items-center gap-4 bg-sunshine-light">
+      {/* The capstone is a stage of the course, not an extra. */}
+      <section aria-labelledby="capstone-heading">
+        <Link
+          href={`${ROUTES.courses}/${course.id}/capstone`}
+          className={cn(
+            'flex flex-wrap items-center gap-4 rounded-card border-2 p-5 shadow-card',
+            'transition-[transform,border-color,box-shadow] duration-200',
+            'hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:hover:translate-y-0',
+            capstoneDone ? 'border-grass bg-grass-light' : 'border-sunshine bg-sunshine-light',
+          )}
+        >
           <span className="text-4xl" aria-hidden="true">
-            {courseBadge.emoji}
+            {capstoneBadge?.emoji ?? '🏅'}
           </span>
-          <div className="min-w-0">
-            <h2 className="card-title font-heading">{courseBadge.name}</h2>
-            <p className="mt-1 text-sm text-ink-soft">
-              {courseBadge.requirement} to earn this, plus a {course.completionXp} XP bonus.
-            </p>
-          </div>
-        </Card>
-      ) : null}
+          <span className="min-w-0 flex-1">
+            <span className="text-xs font-bold uppercase tracking-wide text-sunshine-dark">
+              Final project · {course.capstone.time}
+            </span>
+            <span id="capstone-heading" className="mt-1 block card-title font-heading">
+              {course.capstone.title}
+            </span>
+            <span className="mt-1 block text-sm text-ink-soft">{course.capstone.summary}</span>
+            <span className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+              {doneCount < course.lessons.length && !capstoneDone ? (
+                <>
+                  <Lock className="size-3.5" aria-hidden="true" />
+                  Unlocks after all {course.lessons.length} missions
+                </>
+              ) : (
+                <>
+                  <Target className="size-3.5" aria-hidden="true" />
+                  {capstoneDone ? 'Complete' : 'Ready to start'} · +{course.capstone.xpReward} XP
+                </>
+              )}
+            </span>
+          </span>
+        </Link>
+      </section>
     </Container>
   );
 }

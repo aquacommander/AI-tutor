@@ -37,9 +37,8 @@ const MODULE_TOTALS: Record<string, number> = {
   tutor: 1,
   code: 5,
   create: 3,
-  courses: courses
-    .filter((course) => course.status === 'available')
-    .reduce((total, course) => total + course.lessons.length, 0),
+  // Every mission plus every capstone — the capstone is a real stage.
+  courses: courses.reduce((total, course) => total + course.lessons.length + 1, 0),
 };
 
 export function DashboardContent() {
@@ -69,6 +68,9 @@ export function DashboardContent() {
 
   const { progress, completedChallenges, completedLessons, earnedBadges, recentActivity } = learner;
   const challenge = dailyChallenges[learner.ageGroup];
+  const capstonesDone = courses.filter((course) =>
+    completedLessons.includes(`capstone:${course.id}`),
+  ).length;
 
   const moduleProgress: Record<string, number> = {
     tutor: recentActivity.some((entry) => entry.id.startsWith('tutor')) ? 1 : 0,
@@ -271,6 +273,28 @@ export function DashboardContent() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* Certificate */}
+      <section aria-labelledby="certificate-heading">
+        <Link
+          href={ROUTES.certificate}
+          className="flex flex-wrap items-center gap-4 rounded-card border-2 border-primary bg-primary-surface p-5 shadow-card transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-card-hover motion-reduce:hover:translate-y-0"
+        >
+          <span className="text-4xl" aria-hidden="true">
+            🎓
+          </span>
+          <span className="min-w-0 flex-1">
+            <span id="certificate-heading" className="block card-title font-heading">
+              Your certificate
+            </span>
+            <span className="mt-1 block text-sm text-ink-soft">
+              {capstonesDone} of {courses.length} final projects complete
+              {capstonesDone === courses.length ? ' — ready to print!' : ''}
+            </span>
+          </span>
+          <ArrowRight className="size-5 shrink-0 text-primary" aria-hidden="true" />
+        </Link>
       </section>
 
       {/* Badges */}

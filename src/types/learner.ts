@@ -38,6 +38,26 @@ export interface ActivityEntry {
  * than migrated, so a shape change can never crash the app for a returning
  * learner. Everything here moves to Supabase in v1.1.
  */
+/** What a child did in one guided activity, per the activity specification. */
+export interface ActivityResult {
+  /** `courseId/lessonId`. */
+  key: string;
+  score: number;
+  maxScore: number;
+  correctCategories: number;
+  strongClues: number;
+  completed: boolean;
+  /** One entry per round, in order. */
+  rounds: Array<{
+    roundId: string;
+    category: string;
+    clues: string[];
+    attempts: number;
+    score: number;
+  }>;
+  updatedAt: string;
+}
+
 export interface StoredLearnerState {
   version: 1;
   ageGroup: AgeGroupId;
@@ -46,5 +66,7 @@ export interface StoredLearnerState {
   completedChallenges: string[];
   earnedBadges: string[];
   recentActivity: ActivityEntry[];
+  /** Guided-activity records, keyed by `courseId/lessonId`. */
+  activityResults: Record<string, ActivityResult>;
   lastActivityAt: string;
 }

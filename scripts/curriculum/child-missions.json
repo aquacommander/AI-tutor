@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "The independent mission, written FOR THE CHILD.",
+    "",
+    "The course plan phrases every mission as an instruction to the tutor — 'Give",
+    "the learner a new animal image', 'Require the sentence'. Rendered straight to",
+    "a nine-year-old that is unreadable: it talks about them rather than to them.",
+    "",
+    "These say the same task in the second person. The tutor-voiced original is",
+    "still shown in the grown-ups panel, so nothing from the plan is lost.",
+    "",
+    "AUTHORED, NOT PARSED. Kept separate so the two are never confused."
+  ],
+  "ai-detective-academy/picture-clue-patrol": "Find a picture of an animal — a book, a magazine, or one you draw yourself. Show it to someone and finish this out loud: “I chose ___ because I noticed ___ and ___.” Two clues, not one!",
+  "ai-detective-academy/sound-safari": "Make a sound riddle. Think of a sound, then give someone three clues about it — how high or low it is, its rhythm, how loud it is — without naming what makes it. Can they guess?",
+  "ai-detective-academy/creative-clues": "Someone says “AI definitely made this!” Say it again, but carefully, like a detective. Start with “It might be, because…” and give a real reason.",
+  "ai-detective-academy/glitch-hunt": "Think of a time a phone, tablet or game got something wrong. Explain what happened without saying the computer is stupid — say what the clue was and what might have caused it.",
+  "ai-detective-academy/ai-detective": "Invent one tricky creature that would break your rule. Draw it, then explain which part of the rule it breaks and how you would fix it.",
+  "train-your-robot-brain/feature-find": "Pick a job — sorting socks, packing a lunchbox, choosing a film. Write down three clues that would really help, and one clue that should never be used.",
+  "train-your-robot-brain/data-kitchen": "Invent one piece of bad data — a duplicate, a missing label, or something impossible. Then explain what mistake it would make the machine learn.",
+  "train-your-robot-brain/mood-mixer": "Write one sentence that could sound happy OR cross, depending on what happened before it. Try it on someone and see which way they read it.",
+  "train-your-robot-brain/robot-brain": "Write a short report card for your rule. Put the goal, how it did on the test, one thing it is good at, and one thing it still gets wrong. Be honest about the second one!",
+  "ai-game-creator-lab/game-hero": "Write one rule that keeps your hero safe or keeps the game fair. Start it with IF, and make sure it beats every other rule.",
+  "ai-game-creator-lab/choice-engine": "Write a rule where the game asks permission before using something private about the player. What exactly should it say?",
+  "ai-game-creator-lab/maze-mission": "Draw your maze, then move one wall. Explain out loud how the best route changes — and whether it is now longer, riskier, or both.",
+  "smart-and-safe-ai-heroes/privacy-mission": "Design a sign-up form for an app you would like. Write down only the boxes it truly needs — then cross out anything you could live without.",
+  "smart-and-safe-ai-heroes/truth-tracker": "A friend shares something that might not be true. Write a kind message back. Do not tell them they are wrong — ask where it came from."
+}

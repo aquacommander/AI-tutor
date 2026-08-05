@@ -3,111 +3,55 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Clock, Lightbulb, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Clock, Eye, Lightbulb, Printer, Sparkles } from 'lucide-react';
 import { ActivityGameView } from '@/components/courses/activity-game';
 import { LessonQuiz } from '@/components/courses/lesson-quiz';
 import { LessonVideoPlayer } from '@/components/courses/lesson-video';
+import { MysteryPictureSort } from '@/components/courses/mystery-picture-sort';
+import { BuildItMission } from '@/components/courses/build-it-mission';
+import { EvidenceInvestigator } from '@/components/courses/evidence-investigator';
+import { SoundRiddle } from '@/components/courses/sound-riddle';
+import { TwoClueChallenge } from '@/components/courses/two-clue-challenge';
+import { Badge } from '@/components/ui/badge';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { findActivityGame, type ActivityGame } from '@/data/activities';
 import { findBadge } from '@/data/badges';
+import { findBuildMission } from '@/data/missions/build-it';
 import { CHARACTERS, PIP } from '@/data/characters';
-import { findLessonVideo } from '@/data/lesson-videos';
 import { useLearnerProgress, type LessonReward } from '@/hooks/use-learner-progress';
-import { AGE_GROUP_LABEL, AGE_GROUP_RANGE, ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants';
 import { img } from '@/lib/images';
-import { lessonTime, stageTime, videoMinutes } from '@/lib/lesson-time';
+import { formatDuration } from '@/lib/lesson-time';
 import { cn } from '@/lib/utils';
-import type { Course, Lesson, LessonScene, LessonVideo, Speaker } from '@/types/course';
+import { LESSON_STAGES, type Course, type Lesson } from '@/types/course';
 
 /**
- * A lesson, one step at a time.
+ * A lesson, one stage at a time.
  *
- * The first version of this page rendered all eight scenes as a single scroll of
- * prose, and it did not work: these scripts are written to be *spoken* by a
- * tutor over animation, so as an essay they are a wall of text no seven-year-old
- * will read. A child needs one idea on screen, a picture to look at, and a big
- * button to press.
+ * The shape comes straight from the revised plan's standard lesson flow: a
+ * curiosity hook before the film, the film, a clean concept card, a guided
+ * activity, an independent mission, and a quiz. Each is its own screen, because
+ * a nine-year-old needs one thing in front of them and a button to press.
  *
- * So the same content is now a journey — a handful of sentences per screen, in
- * speech bubbles, with the tutor's own pause-points as real buttons. Everything
- * written for the *grown-up* (objectives, materials, differentiation) has moved
- * out of the child's way into a panel at the bottom.
+ * The concept card matters more than it looks. The plan found that "generated
+ * text inside several scenes is misspelled, fragmented or difficult to read", so
+ * the definition a child actually reads is the platform's, never the one burned
+ * into the animation.
  */
-
-/** A big friendly anchor for each scene. Real illustrations replace these. */
-const SCENE_EMOJI: Record<string, string> = {
-  'cold-open': '❓',
-  'mission-briefing': '🎯',
-  'try-before-telling': '🤔',
-  'the-big-ai-idea': '💡',
-  'worked-example': '🔎',
-  'your-turn': '✋',
-  'glitch-alert': '🐞',
-  'recap-and-badge': '🏅',
-};
-
-/**
- * Splits into sentences without lookbehind — Safari below 16.4 throws a syntax
- * error on those at parse time, which would take the whole bundle down.
- */
-function sentences(text: string): string[] {
-  return (text.match(/[^.!?]+[.!?]+["'’”]*\s*/g) ?? [text]).map((s) => s.trim()).filter(Boolean);
-}
-
-/**
- * Drops instructions that only make sense with a video playing.
- *
- * "Pause the video for thirty seconds" on a page with no video is exactly the
- * kind of thing that leaves a child stuck. The reveal button below *is* the
- * pause, so the instruction is carried by the interface instead of the words.
- */
-function forScreen(text: string): string {
-  return sentences(text)
-    .filter((s) => !/\bvideo\b|countdown reaches zero|\bpause for up to\b/i.test(s))
-    .join(' ');
-}
-
-/** Two sentences per bubble: enough to hold a thought, short enough to read. */
-function bubbles(text: string): string[] {
-  const all = sentences(forScreen(text));
-  const out: string[] = [];
-  for (let i = 0; i < all.length; i += 2) {
-    out.push(all.slice(i, i + 2).join(' '));
-  }
-  return out;
-}
-
-function splitAtReveal(text: string): { prompt: string; reveal: string | null } {
-  const marker = text.indexOf('Welcome back.');
-  if (marker === -1) return { prompt: text, reveal: null };
-  return {
-    prompt: text.slice(0, marker).trim(),
-    reveal: text.slice(marker + 'Welcome back.'.length).trim(),
-  };
-}
 
 type Step =
   | { kind: 'plan' }
+  | { kind: 'hook' }
   | { kind: 'video' }
-  | { kind: 'scene'; scene: LessonScene }
+  | { kind: 'concept' }
   | { kind: 'activity' }
   | { kind: 'mission' }
   | { kind: 'quiz' }
   | { kind: 'done' };
 
-/**
- * The plan names what actually happens. Lessons whose film has been delivered
- * say "Watch the film"; the rest render the script as story text and say so,
- * rather than promising a video that is not there.
- */
-function stageLabel(name: string, hasVideo: boolean): string {
-  if (name !== 'Lesson video') return name;
-  return hasVideo ? 'Watch the film' : `Story time with ${CHARACTERS.tutor.name}`;
-}
-
-const STAGE_EMOJI = ['📖', '🧩', '🚀', '🧠'];
+const STAGE_EMOJI = ['🤔', '🎬', '💡', '🧩', '🚀', '🧠'];
 
 interface LessonViewProps {
   course: Course;
@@ -120,24 +64,17 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
   const { learner, isLoaded, completeLesson, earnBadge } = useLearnerProgress();
   const [index, setIndex] = useState(0);
   const [reward, setReward] = useState<LessonReward | null>(null);
-  const [watched, setWatched] = useState(false);
+  const [activityDone, setActivityDone] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
   const alreadyDone = learner?.completedLessons.includes(`${course.id}/${lesson.id}`) ?? false;
-  const ageGroup = learner?.ageGroup ?? null;
   const game = findActivityGame(course.id, lesson.id);
-  const video = findLessonVideo(course.id, lesson.id);
 
-  // Mirrors the lesson's own component table: story, guided activity,
-  // independent mission, quiz. The mission gets its own screen because the
-  // material gives it its own stage and its own 8-12 minutes.
-  // With a film, the eight story screens become one video step — the same
-  // scenes, watched instead of read, with the script still available beneath it.
   const steps: Step[] = [
     { kind: 'plan' },
-    ...(video
-      ? [{ kind: 'video' as const }]
-      : lesson.scenes.map((scene) => ({ kind: 'scene' as const, scene }))),
+    { kind: 'hook' },
+    { kind: 'video' },
+    { kind: 'concept' },
     { kind: 'activity' },
     { kind: 'mission' },
     { kind: 'quiz' },
@@ -145,7 +82,7 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
   ];
   const step = steps[index];
 
-  // Every step starts at the top. Landing halfway down a new screen is
+  // Every stage starts at the top. Landing halfway down a new screen is
   // disorienting for a young reader.
   useEffect(() => {
     topRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -157,12 +94,9 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
   const handlePass = (score: number) => {
     const earned = completeLesson(course.id, lesson.id);
     if (earned) {
-      setReward(
-        score === lesson.quiz.length
-          ? { ...earned, badgeIds: [...earned.badgeIds, 'quiz-champ'] }
-          : earned,
-      );
-      if (score === lesson.quiz.length) earnBadge('quiz-champ');
+      const full = score === lesson.quiz.length;
+      if (full) earnBadge('quiz-champ');
+      setReward(full ? { ...earned, badgeIds: [...earned.badgeIds, 'quiz-champ'] } : earned);
     }
     goNext();
   };
@@ -173,7 +107,6 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
     <Container className="max-w-3xl space-y-6 pb-8">
       <div ref={topRef} className="scroll-mt-28" />
 
-      {/* Where am I in the mission? */}
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Link
@@ -199,7 +132,8 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
                 )}
               >
                 <span className="sr-only">
-                  {stepName(entry)} — {position < index ? 'done' : position === index ? 'current' : 'to come'}
+                  {stepName(entry)} —{' '}
+                  {position < index ? 'done' : position === index ? 'current' : 'to come'}
                 </span>
               </span>
             </li>
@@ -209,41 +143,81 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
         <h1 className="mt-3 font-heading text-xl font-bold sm:text-2xl">{lesson.title}</h1>
       </div>
 
-      {step.kind === 'plan' ? (
-        <PlanStep lesson={lesson} course={course} video={video} onNext={goNext} />
-      ) : null}
+      {step.kind === 'plan' ? <PlanStep lesson={lesson} course={course} onNext={goNext} /> : null}
 
-      {step.kind === 'video' && video ? (
+      {step.kind === 'hook' ? <HookStep lesson={lesson} onNext={goNext} /> : null}
+
+      {step.kind === 'video' ? (
         <div className="space-y-4">
-          <BigHeading emoji="🎬" title="Watch the mission" time={`${videoMinutes(video)} min`} />
-          <LessonVideoPlayer video={video} lesson={lesson} onWatched={() => setWatched(true)} />
+          <BigHeading
+            emoji="🎬"
+            title="Watch the mission"
+            time={formatDuration(lesson.video.durationSeconds)}
+          />
+          <Card className="border-primary bg-primary-surface">
+            <p className="flex items-start gap-2 leading-relaxed">
+              <Eye className="mt-1 size-5 shrink-0 text-primary" aria-hidden="true" />
+              <span>
+                <span className="font-heading font-bold">Look out for: </span>
+                {lesson.watchFocus}
+              </span>
+            </p>
+          </Card>
+          <LessonVideoPlayer video={lesson.video} title={lesson.title} onWatched={() => {}} />
           <Button size="lg" onClick={goNext} className="w-full">
-            {watched ? 'Finished watching — on to the activity!' : 'Skip to the activity'}
+            I have watched it
             <ArrowRight className="size-5" aria-hidden="true" />
           </Button>
         </div>
       ) : null}
 
-      {step.kind === 'scene' ? (
-        <SceneStep
-          key={step.scene.id}
-          scene={step.scene}
-          lessonImage={course.image}
-          time={lesson.components[0]?.time}
+      {step.kind === 'concept' ? <ConceptStep lesson={lesson} onNext={goNext} /> : null}
+
+      {step.kind === 'activity' ? (
+        <ActivityStep
+          lesson={lesson}
+          lessonKey={`${course.id}/${lesson.id}`}
+          game={game}
+          onNext={() => {
+            setActivityDone(true);
+            goNext();
+          }}
+        />
+      ) : null}
+
+      {step.kind === 'mission' ? (
+        <MissionStep
+          lesson={lesson}
+          lessonKey={`${course.id}/${lesson.id}`}
           onNext={goNext}
         />
       ) : null}
 
-      {step.kind === 'activity' ? (
-        <ActivityStep lesson={lesson} game={game} onNext={goNext} />
-      ) : null}
-
-      {step.kind === 'mission' ? <MissionStep lesson={lesson} onNext={goNext} /> : null}
-
       {step.kind === 'quiz' ? (
         <div className="space-y-4">
-          <BigHeading emoji="🧠" title="Show what you know" time={lesson.components[3]?.time} />
-          <LessonQuiz questions={lesson.quiz} onPass={handlePass} alreadyPassed={alreadyDone} />
+          <BigHeading emoji="🧠" title="Show what you know" time="5–7 min" />
+          {/* The plan's progress rule: "Require completion of the activity
+              before unlocking the quiz." A nudge is not a requirement, so the
+              quiz is genuinely not rendered until the activity is done. A child
+              who has already passed this lesson keeps free access. */}
+          {activityDone || alreadyDone ? (
+            <LessonQuiz questions={lesson.quiz} onPass={handlePass} alreadyPassed={alreadyDone} />
+          ) : (
+            <Card className="border-sunshine bg-sunshine-light text-center">
+              <span className="block text-5xl" aria-hidden="true">
+                🔒
+              </span>
+              <h3 className="mt-3 font-heading text-xl font-bold">Finish the activity first</h3>
+              <p className="mx-auto mt-2 max-w-md leading-relaxed text-ink-soft">
+                The quiz asks about the things you discover while playing, so it unlocks once the
+                activity is done.
+              </p>
+              <Button size="lg" onClick={goBack} className="mt-4">
+                <ArrowLeft className="size-5" aria-hidden="true" />
+                Back to the activity
+              </Button>
+            </Card>
+          )}
         </div>
       ) : null}
 
@@ -264,68 +238,7 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
         </Button>
       ) : null}
 
-      {/* Everything written for the adult, kept out of the child's way. */}
-      <details className="rounded-card border border-border-soft bg-surface p-4 shadow-card">
-        <summary className="cursor-pointer font-heading font-bold">For grown-ups and tutors</summary>
-
-        <div className="mt-4 space-y-5 text-sm">
-          <section>
-            <h2 className="font-heading font-bold">What this lesson teaches</h2>
-            <ul className="mt-2 space-y-1.5">
-              {lesson.objectives.map((objective) => (
-                <li key={objective} className="flex gap-2">
-                  <Check className="mt-0.5 size-4 shrink-0 text-grass-dark" aria-hidden="true" />
-                  {objective}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="font-heading font-bold">You will need</h2>
-            <ul className="mt-2 ml-5 list-disc space-y-1 text-ink-soft">
-              {lesson.materials.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-
-          {/* The child plays the on-screen game; this is the same activity for
-              anyone who wants to run it with real cards, away from a screen. */}
-          {game ? (
-            <section>
-              <h2 className="font-heading font-bold">
-                {lesson.activity.title} away from the screen ({lesson.activity.time})
-              </h2>
-              <p className="mt-1 text-ink-soft">{lesson.activity.purpose}</p>
-              <ol className="mt-2 ml-5 list-decimal space-y-1 text-ink-soft">
-                {lesson.activity.steps.map((stepText) => (
-                  <li key={stepText}>{stepText}</li>
-                ))}
-              </ol>
-            </section>
-          ) : null}
-
-          {isLoaded && ageGroup ? (
-            <section>
-              <h2 className="font-heading font-bold">
-                Adapting for {AGE_GROUP_LABEL[ageGroup]}s, ages {AGE_GROUP_RANGE[ageGroup]}
-              </h2>
-              <p className="mt-2 text-ink-soft">{lesson.differentiation[ageGroup]}</p>
-            </section>
-          ) : null}
-
-          <section>
-            <h2 className="font-heading font-bold">The mistake to watch for</h2>
-            <p className="mt-2 text-ink-soft">{lesson.misconception}</p>
-          </section>
-
-          <section>
-            <h2 className="font-heading font-bold">What your child did</h2>
-            <p className="mt-2 text-ink-soft">{lesson.parentSummary}</p>
-          </section>
-        </div>
-      </details>
+      <GrownUpPanel lesson={lesson} courseId={course.id} game={game !== undefined} />
 
       {previous ? (
         <p className="text-sm">
@@ -342,13 +255,17 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
 }
 
 function stepName(step: Step): string {
-  if (step.kind === 'plan') return "Today's mission";
-  if (step.kind === 'video') return 'Watch the film';
-  if (step.kind === 'scene') return step.scene.label;
-  if (step.kind === 'activity') return 'Activity';
-  if (step.kind === 'mission') return 'Your own mission';
-  if (step.kind === 'quiz') return 'Quiz';
-  return 'Finish';
+  const names: Record<Step['kind'], string> = {
+    plan: "Today's mission",
+    hook: 'Think first',
+    video: 'Watch the film',
+    concept: 'The big idea',
+    activity: 'Activity',
+    mission: 'Your own mission',
+    quiz: 'Quiz',
+    done: 'Finish',
+  };
+  return names[step.kind];
 }
 
 function BigHeading({ emoji, title, time }: { emoji: string; title: string; time?: string }) {
@@ -368,42 +285,30 @@ function BigHeading({ emoji, title, time }: { emoji: string; title: string; time
   );
 }
 
-/**
- * The lesson's plan, straight from its component table.
- *
- * Children settle far better when they can see how long something lasts and
- * what is coming, and it is the one screen a parent can glance at to know what
- * the next forty minutes involve.
- */
 function PlanStep({
   lesson,
   course,
-  video,
   onNext,
 }: {
   lesson: Lesson;
   course: Course;
-  video: LessonVideo | undefined;
   onNext: () => void;
 }) {
   return (
     <Card>
       <div className="text-center">
         <Image
-          {...img(course.image)}
+          {...img(lesson.video.poster)}
           alt=""
           aria-hidden="true"
-          sizes="320px"
+          sizes="(max-width: 640px) 90vw, 480px"
           priority
-          className="mx-auto h-36 w-auto object-contain motion-safe:animate-float-slow"
+          className="mx-auto w-full max-w-sm rounded-card object-cover"
         />
-        <p className="mt-3 text-sm font-bold uppercase tracking-wide text-primary">
-          Mission {lesson.number} · about {lessonTime(lesson, video)}
+        <p className="mt-4 text-sm font-bold uppercase tracking-wide text-primary">
+          Mission {lesson.number} of {course.lessons.length} · about {lesson.learnerTime}
         </p>
         <h2 className="mt-1 font-heading text-2xl font-bold sm:text-3xl">{lesson.title}</h2>
-        <p className="mt-3 text-lg leading-relaxed text-ink-soft">
-          <span className="font-bold text-ink">Your mission:</span> {lesson.mission}
-        </p>
       </div>
 
       <div className="mt-7">
@@ -428,11 +333,10 @@ function PlanStep({
       </div>
 
       <h3 className="mt-7 text-center font-heading text-lg font-bold">Here is the plan</h3>
-
       <ol className="mt-4 space-y-3">
-        {lesson.components.map((component, i) => (
+        {LESSON_STAGES.map((stage, i) => (
           <li
-            key={component.name}
+            key={stage.name}
             className="flex items-center gap-4 rounded-card border-2 border-border-soft bg-surface p-4"
           >
             <span
@@ -442,13 +346,13 @@ function PlanStep({
               {STAGE_EMOJI[i] ?? '✨'}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-heading text-lg font-bold">
-                {stageLabel(component.name, video !== undefined)}
-              </span>
-              <span className="block text-sm text-ink-soft">{component.purpose}</span>
+              <span className="block font-heading text-lg font-bold">{stage.name}</span>
+              <span className="block text-sm text-ink-soft">{stage.purpose}</span>
             </span>
             <span className="shrink-0 rounded-button bg-sunshine-light px-3 py-1.5 text-sm font-bold text-sunshine-dark">
-              {stageTime(component.name, component.time, video)}
+              {stage.name === 'Watch the mission'
+                ? formatDuration(lesson.video.durationSeconds)
+                : stage.minutes}
             </span>
           </li>
         ))}
@@ -462,162 +366,124 @@ function PlanStep({
   );
 }
 
-/** A speech bubble with the character who is talking. */
-function Bubble({
-  speaker,
-  showName = true,
-  children,
-}: {
-  speaker: Speaker;
-  /** Only the first bubble of a run is named; repeating it every time reads oddly. */
-  showName?: boolean;
-  children: React.ReactNode;
-}) {
-  const isGlitch = speaker === 'glitch';
-  const character = CHARACTERS[speaker];
+/**
+ * The curiosity hook, before the film.
+ *
+ * The plan puts this first for a reason — "Do not define image classification
+ * yet." A child who has already had a guess watches the film looking for an
+ * answer rather than waiting to be told one.
+ */
+function HookStep({ lesson, onNext }: { lesson: Lesson; onNext: () => void }) {
+  const [ready, setReady] = useState(false);
 
   return (
-    <div className="flex items-start gap-3">
-      <Image
-        {...img(character.avatar)}
-        alt=""
-        aria-hidden="true"
-        sizes="64px"
-        className={cn(
-          'size-12 shrink-0 rounded-full object-cover',
-          isGlitch ? 'bg-coral/20' : 'bg-primary-surface',
-        )}
-      />
+    <Card className="border-primary bg-primary-surface">
+      <BigHeading emoji="🤔" title="Think first" time="2–3 min" />
 
-      <p
-        className={cn(
-          'rounded-card px-4 py-3 text-lg leading-relaxed sm:text-xl',
-          isGlitch ? 'bg-coral/10 text-ink' : 'bg-primary-surface text-ink',
-        )}
-      >
-        {showName ? (
-          <span
-            className={cn(
-              'font-heading font-bold',
-              isGlitch ? 'text-coral-dark' : 'text-primary-dark',
-            )}
-          >
-            {character.name}:{' '}
-          </span>
-        ) : null}
-        {children}
-      </p>
-    </div>
-  );
-}
+      <p className="mt-5 text-lg leading-relaxed sm:text-xl">{lesson.hook}</p>
 
-function SceneStep({
-  scene,
-  lessonImage,
-  time,
-  onNext,
-}: {
-  scene: LessonScene;
-  lessonImage: Course['image'];
-  time: string | undefined;
-  onNext: () => void;
-}) {
-  const [revealed, setRevealed] = useState(false);
-  const emoji = SCENE_EMOJI[scene.id] ?? '✨';
-
-  const first = scene.turns[0];
-  const { prompt, reveal } = scene.isPause
-    ? splitAtReveal(first?.text ?? '')
-    : { prompt: '', reveal: null };
-
-  return (
-    <Card className="overflow-hidden">
-      <BigHeading emoji={emoji} title={scene.label} time={scene.id === 'cold-open' ? time : undefined} />
-
-      {/* One picture per screen keeps the page feeling like a storybook. */}
-      {scene.id === 'cold-open' ? (
-        <Image
-          {...img(lessonImage)}
-          alt=""
-          aria-hidden="true"
-          sizes="320px"
-          className="mx-auto mt-4 h-36 w-auto object-contain motion-safe:animate-float-slow"
-        />
-      ) : null}
-
-      <div className="mt-6 space-y-4">
-        {scene.isPause ? (
-          <>
-            {bubbles(prompt).map((text, i) => (
-              <Bubble key={i} speaker="tutor" showName={i === 0}>
-                {text}
-              </Bubble>
-            ))}
-
-            {reveal ? (
-              revealed ? (
-                bubbles(reveal).map((text, i) => (
-                  <Bubble key={`r${i}`} speaker="tutor" showName={i === 0}>
-                    {text}
-                  </Bubble>
-                ))
-              ) : (
-                <div className="rounded-card border-2 border-dashed border-primary/40 bg-primary-surface/50 p-5 text-center">
-                  <p className="font-heading text-lg font-bold">Have a think first!</p>
-                  <p className="mt-1 text-sm text-ink-soft">
-                    Say your answer out loud, or tell someone next to you.
-                  </p>
-                  <Button size="lg" onClick={() => setRevealed(true)} className="mt-4">
-                    <Lightbulb className="size-5" aria-hidden="true" />
-                    I&rsquo;ve had a go!
-                  </Button>
-                </div>
-              )
-            ) : null}
-          </>
-        ) : (
-          scene.turns.flatMap((turn, turnIndex) =>
-            bubbles(turn.text).map((text, i) => (
-              <Bubble key={`${turnIndex}-${i}`} speaker={turn.speaker} showName={i === 0}>
-                {text}
-              </Bubble>
-            )),
-          )
-        )}
-      </div>
-
-      {!scene.isPause || revealed || !reveal ? (
-        <Button size="lg" onClick={onNext} className="mt-6 w-full">
-          Next
-          <ArrowRight className="size-5" aria-hidden="true" />
-        </Button>
-      ) : null}
+      {ready ? (
+        <div className="mt-6 rounded-card bg-surface p-5 text-center">
+          <p className="font-heading text-lg font-bold">Keep your answer in mind.</p>
+          <p className="mt-1 text-ink-soft">
+            Now watch the film and see whether you were on the right track.
+          </p>
+          <Button size="lg" onClick={onNext} className="mt-4 w-full">
+            Watch the mission
+            <ArrowRight className="size-5" aria-hidden="true" />
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-6 rounded-card border-2 border-dashed border-primary/40 bg-surface/60 p-5 text-center">
+          <p className="text-ink-soft">Say your answer out loud, or tell someone next to you.</p>
+          <Button size="lg" onClick={() => setReady(true)} className="mt-4">
+            <Lightbulb className="size-5" aria-hidden="true" />
+            I&rsquo;ve had a go!
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
 
 /**
- * The guided activity, played rather than described.
+ * The clean concept card.
  *
- * The course material writes this as a classroom task with printed cards. On
- * screen that became a list of instructions telling a child to go and find
- * twelve animal pictures, which is not an activity — it is homework. So the
- * same task is a game, and the printed-card version moves into the grown-ups
- * panel for anyone who wants to run it away from a screen.
+ * This is the plan's fix for the unreadable text inside the animations: the same
+ * idea, in the platform's own words, immediately after the film.
  */
+function ConceptStep({ lesson, onNext }: { lesson: Lesson; onNext: () => void }) {
+  return (
+    <Card>
+      <BigHeading emoji="💡" title="The big idea" time="3–4 min" />
+
+      <p className="mt-5 rounded-card bg-primary-surface p-5 text-center font-heading text-xl font-bold leading-relaxed sm:text-2xl">
+        {lesson.concept.bigIdea}
+      </p>
+
+      <h3 className="mt-6 flex items-center gap-2 font-heading text-lg font-bold">
+        <Sparkles className="size-5 text-primary" aria-hidden="true" />
+        Words to know
+      </h3>
+      <ul className="mt-3 flex flex-wrap gap-2">
+        {lesson.concept.vocabulary.map((word) => (
+          <li
+            key={word}
+            className="rounded-button bg-primary-surface px-4 py-2 font-heading font-bold text-primary-dark"
+          >
+            {word}
+          </li>
+        ))}
+      </ul>
+
+      <h3 className="mt-6 font-heading text-lg font-bold">By the end you can</h3>
+      <ul className="mt-3 space-y-2">
+        {lesson.concept.objectives.map((objective) => (
+          <li key={objective} className="flex gap-2 text-lg leading-relaxed">
+            <Check className="mt-1.5 size-5 shrink-0 text-grass-dark" aria-hidden="true" />
+            {objective}
+          </li>
+        ))}
+      </ul>
+
+      <Button size="lg" onClick={onNext} className="mt-6 w-full">
+        Got it — let&rsquo;s play
+        <ArrowRight className="size-5" aria-hidden="true" />
+      </Button>
+    </Card>
+  );
+}
+
 function ActivityStep({
   lesson,
+  lessonKey,
   game,
   onNext,
 }: {
   lesson: Lesson;
+  lessonKey: string;
   game: ActivityGame | undefined;
   onNext: () => void;
 }) {
+  // Lesson 1's activity has its own two-part shape — category, then evidence —
+  // so it gets a bespoke component rather than the shared round engine.
+  if (lessonKey === 'ai-detective-academy/picture-clue-patrol') {
+    return (
+      <div className="space-y-4">
+        <BigHeading emoji="🧩" title="Mystery Picture Sort" time="12–15 min" />
+        <p className="text-center text-lg text-ink-soft">
+          Eight pictures have arrived at the Pixel Pet Shelter. Sort each one — and say which two
+          clues helped you decide. The shelter only takes <strong>real</strong> animals.
+        </p>
+        <MysteryPictureSort lessonKey={lessonKey} onFinish={onNext} />
+      </div>
+    );
+  }
+
   if (game) {
     return (
       <div className="space-y-4">
-        <BigHeading emoji="🧩" title={game.title} time={lesson.activity.time} />
+        <BigHeading emoji="🧩" title={game.title} time="12–15 min" />
         <p className="text-center text-lg text-ink-soft">{game.intro}</p>
         <ActivityGameView game={game} onFinish={onNext} />
       </div>
@@ -628,41 +494,90 @@ function ActivityStep({
   // ever a dead end.
   return (
     <Card>
-      <BigHeading emoji="🧩" title={lesson.activity.title} time={lesson.activity.time} />
-      <p className="mt-4 text-center text-lg text-ink-soft">{lesson.activity.purpose}</p>
+      <BigHeading emoji="🧩" title={lesson.activity.title} time="12–15 min" />
       <ol className="mt-6 ml-5 list-decimal space-y-2 text-lg">
         {lesson.activity.steps.map((stepText) => (
           <li key={stepText}>{stepText}</li>
         ))}
       </ol>
       <Button size="lg" onClick={onNext} className="mt-6 w-full">
-        Next
+        Done
         <ArrowRight className="size-5" aria-hidden="true" />
       </Button>
     </Card>
   );
 }
 
-/**
- * The independent mission gets its own screen because the course material gives
- * it its own stage — "apply the concept without step-by-step help", 8-12
- * minutes. Tucked under the guided activity it read as an afterthought.
- */
-function MissionStep({ lesson, onNext }: { lesson: Lesson; onNext: () => void }) {
-  const stage = lesson.components[2];
+function MissionStep({
+  lesson,
+  lessonKey,
+  onNext,
+}: {
+  lesson: Lesson;
+  lessonKey: string;
+  onNext: () => void;
+}) {
+  // Lesson 1's independent mission is playable: three random pictures, name the
+  // animal, then justify it with two clues.
+  if (lessonKey === 'ai-detective-academy/picture-clue-patrol') {
+    return (
+      <div className="space-y-4">
+        <BigHeading emoji="🚀" title="Two-Clue Animal Challenge" time="5–8 min" />
+        <p className="text-center text-lg text-ink-soft">
+          Three pictures, on your own this time. Name the animal — then say which{' '}
+          <strong>two clues</strong> made you sure.
+        </p>
+        <TwoClueChallenge lessonKey={lessonKey} onFinish={onNext} />
+      </div>
+    );
+  }
+
+  if (lessonKey === 'ai-detective-academy/creative-clues') {
+    return (
+      <div className="space-y-4">
+        <BigHeading emoji="🕵️" title="AI Evidence Investigator" time="5–8 min" />
+        <p className="text-center text-lg text-ink-soft">
+          Six mystery items. Say what you notice — then make the <strong>most careful</strong> claim
+          the evidence supports.
+        </p>
+        <EvidenceInvestigator lessonKey={lessonKey} onFinish={onNext} />
+      </div>
+    );
+  }
+
+  const build = findBuildMission(lessonKey);
+  if (build) {
+    return (
+      <div className="space-y-4">
+        <BigHeading emoji="🚀" title={build.title} time="5–8 min" />
+        <p className="text-center text-lg text-ink-soft">{build.intro}</p>
+        <BuildItMission mission={build} lessonKey={lessonKey} onFinish={onNext} />
+      </div>
+    );
+  }
+
+  if (lessonKey === 'ai-detective-academy/sound-safari') {
+    return (
+      <div className="space-y-4">
+        <BigHeading emoji="🎧" title="Sound Riddle Challenge" time="5–8 min" />
+        <p className="text-center text-lg text-ink-soft">
+          Six mystery sounds. Describe each one — how high, its rhythm, how loud — and{' '}
+          <strong>then</strong> guess what made it.
+        </p>
+        <SoundRiddle lessonKey={lessonKey} onFinish={onNext} />
+      </div>
+    );
+  }
 
   return (
     <Card className="border-sunshine bg-sunshine-light">
-      <BigHeading emoji="🚀" title="Your own mission" time={stage?.time} />
-
+      <BigHeading emoji="🚀" title="Your own mission" time="5–8 min" />
       <p className="mt-2 text-center text-sm font-semibold text-sunshine-dark">
-        {stage?.purpose ?? 'Apply the concept without step-by-step help'}
+        Make something without step-by-step help.
       </p>
-
       <p className="mt-5 rounded-card bg-surface p-5 text-lg leading-relaxed">
-        {lesson.independentMission}
+        {lesson.childMission}
       </p>
-
       <Button size="lg" onClick={onNext} className="mt-6 w-full">
         I have done it — on to the quiz!
         <ArrowRight className="size-5" aria-hidden="true" />
@@ -697,9 +612,7 @@ function DoneStep({
           sizes="160px"
           className="mx-auto size-28 object-contain motion-safe:animate-float"
         />
-        <h2 className="mt-2 font-heading text-2xl font-bold sm:text-3xl">
-          {reward?.courseCompleted ? `You finished ${course.title}!` : 'Mission complete!'}
-        </h2>
+        <h2 className="mt-2 font-heading text-2xl font-bold sm:text-3xl">Mission complete!</h2>
         {reward ? (
           <p className="mt-2 font-heading text-xl font-bold text-grass-dark">+{reward.xp} XP</p>
         ) : null}
@@ -735,36 +648,95 @@ function DoneStep({
         </p>
       </Card>
 
-      {lesson.vocabulary.length > 0 ? (
-        <Card>
-          <h2 className="flex items-center gap-2 font-heading text-lg font-bold">
-            <Sparkles className="size-5 text-primary" aria-hidden="true" />
-            New words you learned
-          </h2>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {lesson.vocabulary.map((word) => (
-              <li
-                key={word}
-                className="rounded-button bg-primary-surface px-4 py-2 font-heading font-bold text-primary-dark"
-              >
-                {word}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      ) : null}
-
       {next ? (
         <ButtonLink href={`${ROUTES.courses}/${course.id}/${next.id}`} size="lg" className="w-full">
           Next mission: {next.title}
           <ArrowRight className="size-5" aria-hidden="true" />
         </ButtonLink>
       ) : (
-        <ButtonLink href={`${ROUTES.courses}/${course.id}`} size="lg" className="w-full">
-          Back to the course
+        <ButtonLink
+          href={`${ROUTES.courses}/${course.id}/capstone`}
+          size="lg"
+          className="w-full"
+        >
+          Last one! On to the {course.capstone.title}
           <ArrowRight className="size-5" aria-hidden="true" />
         </ButtonLink>
       )}
     </div>
+  );
+}
+
+/** Everything written for the adult, kept out of the child's way. */
+function GrownUpPanel({
+  lesson,
+  courseId,
+  game,
+}: {
+  lesson: Lesson;
+  courseId: string;
+  game: boolean;
+}) {
+  return (
+    <details className="rounded-card border border-border-soft bg-surface p-4 shadow-card">
+      <summary className="cursor-pointer font-heading font-bold">For grown-ups and tutors</summary>
+
+      <div className="mt-4 space-y-5 text-sm">
+        <section>
+          <Link
+            href={`${ROUTES.courses}/${courseId}/${lesson.id}/sheet`}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-button bg-primary px-4 font-bold text-white"
+          >
+            <Printer className="size-4" aria-hidden="true" />
+            Printable activity sheet and answer key
+          </Link>
+        </section>
+
+        <section>
+          <h2 className="font-heading font-bold">What this lesson teaches</h2>
+          <ul className="mt-2 space-y-1.5">
+            {lesson.concept.objectives.map((objective) => (
+              <li key={objective} className="flex gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-grass-dark" aria-hidden="true" />
+                {objective}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="font-heading font-bold">Adapting for other ages</h2>
+          <p className="mt-2 text-ink-soft">
+            <Badge tone="green">Ages 6–8</Badge> {lesson.adaptation.younger}
+          </p>
+          <p className="mt-2 text-ink-soft">
+            <Badge tone="purple">Ages 13–16</Badge> {lesson.adaptation.older}
+          </p>
+        </section>
+
+        {game ? (
+          <section>
+            <h2 className="font-heading font-bold">
+              {lesson.activity.title} away from the screen
+            </h2>
+            <ol className="mt-2 ml-5 list-decimal space-y-1 text-ink-soft">
+              {lesson.activity.steps.map((stepText) => (
+                <li key={stepText}>{stepText}</li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
+
+        <section>
+          <h2 className="font-heading font-bold">Independent mission, as written for you</h2>
+          <p className="mt-2 text-ink-soft">{lesson.independentMission}</p>
+        </section>
+
+        <section>
+          <h2 className="font-heading font-bold">What your child did</h2>
+          <p className="mt-2 text-ink-soft">{lesson.parentTakeaway}</p>
+        </section>
+      </div>
+    </details>
   );
 }

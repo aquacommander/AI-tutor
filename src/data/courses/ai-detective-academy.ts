@@ -1,19 +1,19 @@
 import type { Course } from '@/types/course';
 
 /**
- * Course 1 — AI Detective Academy.
+ * AI Detective Academy
  *
- * Transcribed from AI_for_Kids_Complete_Course_Material.docx. Every field comes
- * from that document; nothing here is invented. `scripts/check-curriculum.mjs`
- * asserts the parts that must hold — five lessons, five quiz questions each,
- * and every correct answer present in its own options list.
+ * Generated from AI_for_Kids_Revised_14_Video_Course_Plan.docx by
+ * `scripts/curriculum/`. Content comes from that document; the quiz distractors
+ * come from `scripts/curriculum/distractors.json` and are authored rather than
+ * parsed. Video durations are read from the files themselves, never from the
+ * plan — the two disagreed before.
  *
- * `visual` and `productionAssets` are film-crew direction rather than learner
- * content. They live here so the video production and the platform read from
- * one source instead of drifting apart.
+ * Do not hand-edit: re-run the generator instead.
  */
 export const aiDetectiveAcademy: Course = {
   "id": "ai-detective-academy",
+  "number": 1,
   "title": "AI Detective Academy",
   "tagline": "Use clues to discover how AI sees, hears, compares and sometimes gets things wrong.",
   "outcomes": [
@@ -27,1203 +27,523 @@ export const aiDetectiveAcademy: Course = {
       "id": "picture-clue-patrol",
       "number": 1,
       "title": "Picture Clue Patrol: How Does AI See?",
-      "mission": "Help Pip sort mystery pictures using visible clues.",
-      "concept": "image classification",
-      "badgeId": "pixel-detective",
-      "learnerTime": "30–45 minutes",
-      "xpReward": 60,
-      "objectives": [
-        "Define image classification using a simple example.",
-        "Identify at least two visual features used for sorting.",
-        "Explain why an unusual image may be misclassified."
-      ],
-      "vocabulary": [
-        "image",
-        "feature",
-        "label",
-        "classification",
-        "prediction"
-      ],
-      "materials": [
-        "12 printed or on-screen animal cards",
-        "Three category signs: Cat, Dog, Unsure",
-        "Pencil and mission sheet"
-      ],
-      "components": [
-        {
-          "name": "Lesson video",
-          "time": "10 min",
-          "purpose": "Story, concept explanation and guided pauses"
-        },
-        {
-          "name": "Mystery Picture Sort",
-          "time": "10–12 min",
-          "purpose": "Hands-on or interactive practice"
-        },
-        {
-          "name": "Independent mission",
-          "time": "8–12 min",
-          "purpose": "Apply the concept without step-by-step help"
-        },
-        {
-          "name": "Quiz and reflection",
-          "time": "5 min",
-          "purpose": "Check understanding and explain one key idea"
-        }
-      ],
-      "scenes": [
-        {
-          "id": "cold-open",
-          "label": "Cold open",
-          "time": "0:00–0:50",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Can a robot see a cat if the picture is upside down, tiny, or partly hidden? Meet Pip, our curious robot, and Glitch, a tiny bug who loves making silly mistakes. Today your mission is help Pip sort mystery pictures using visible clues. Watch carefully, because the first clue appears before the countdown reaches zero. Ready? Three, two, one — mission start!"
-            }
-          ],
-          "visual": "Fast animated opening. Show a normal cat picture changing into a shadow, zoomed crop and upside-down version. Display mission badge: Pixel Detective.",
-          "isPause": false
-        },
-        {
-          "id": "mission-briefing",
-          "label": "Mission briefing",
-          "time": "0:50–1:45",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Here is the problem. A delivery drone has mixed photographs of cats, dogs and toy animals. It must place each image in the correct folder before the pet shelter opens. Pip cannot solve it alone, because AI needs clear information and careful testing. Your job is not only to find an answer. Your job is to explain how you know. That is what real AI detectives and creators do."
-            }
-          ],
-          "visual": "Introduce the story setting: the colorful Pixel Pet Shelter. Show Pip looking puzzled and a simple mission map.",
-          "isPause": false
-        },
-        {
-          "id": "try-before-telling",
-          "label": "Try before telling",
-          "time": "1:45–3:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Before I explain anything, try this. Look at three shadow pictures. Which one is most likely a cat, and which clue helped you decide? Pause the video for thirty seconds. Make your choice, point to it, or write it down. Welcome back. Did you notice that you used clues rather than magic? You looked for patterns, compared possibilities, and made a decision."
-            }
-          ],
-          "visual": "Show the learner prompt with a 30-second countdown. Use large icons and very little text. Show three animal silhouettes with ears, tail and body-shape clues.",
-          "isPause": true
-        },
-        {
-          "id": "the-big-ai-idea",
-          "label": "The big AI idea",
-          "time": "3:00–4:35",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "The big idea today is image classification. Image classification means choosing a category for a picture. A computer measures patterns such as shapes, edges, colors and textures, then compares them with patterns learned from examples. AI does not understand the world exactly as a person does. It follows patterns found in examples, rules, or signals. That can be useful, but it also means we must check its work."
-            }
-          ],
-          "visual": "Animate the concept using three simple steps: picture enters, features are noticed, category is predicted. Highlight the key word image classification.",
-          "isPause": false
-        },
-        {
-          "id": "worked-example",
-          "label": "Worked example",
-          "time": "4:35–6:05",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Let us solve one together. We compare a real cat, a toy cat and a fox. Pointed ears alone are not enough. We also inspect the face shape, paws, tail and texture. The toy cat may look cat-like, but the label depends on the mission: are we sorting by appearance or by what the object truly is? First, we collect the clues. Next, we compare them. Then, we make a choice and test it. If the answer is wrong, we do not say, ‘The robot is bad.’ We ask, ‘Which clue, example, or rule needs improving?’"
-            }
-          ],
-          "visual": "Step-by-step demonstration with check marks. Circle ears, paws, tail and fur; then switch the sorting question to show why labels matter.",
-          "isPause": false
-        },
-        {
-          "id": "your-turn",
-          "label": "Your turn",
-          "time": "6:05–7:30",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Now it is your turn. Choose which folder receives a blurry rabbit picture: rabbit, cat or unsure. Use at least two clues. Pause for up to one minute. When you return, say your answer aloud using this sentence: ‘I chose ___ because ___.’ Welcome back. A strong answer includes both the choice and the reason."
-            }
-          ],
-          "visual": "Display three choices and a one-minute pause screen. Folders labelled Rabbit, Cat and Need More Information.",
-          "isPause": true
-        },
-        {
-          "id": "glitch-alert",
-          "label": "Glitch alert",
-          "time": "7:30–8:55",
-          "turns": [
-            {
-              "speaker": "glitch",
-              "text": "I know! The AI answer must always be correct!"
-            },
-            {
-              "speaker": "tutor",
-              "text": "Glitch, that is today’s trap. AI is not looking with a mind or understanding the animal. It is matching numerical patterns, and unusual lighting or angles can confuse it. We should be curious, not afraid, when an AI makes a mistake. A mistake is a clue that helps us improve the data, the rule, or the way a person uses the tool."
-            }
-          ],
-          "visual": "Glitch confidently gives a wrong answer; freeze-frame with a playful buzzer. Show ‘Check, Question, Improve.’",
-          "isPause": false
-        },
-        {
-          "id": "recap-and-badge",
-          "label": "Recap and badge",
-          "time": "8:55–10:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Mission complete. Today you learned three things. One: images can be sorted by learned patterns. Two: the label must match the question we are asking. Three: unusual pictures can cause mistakes. Your next task is the Mystery Picture Sort. Complete it to earn the Pixel Detective badge. Before you go, tell someone at home: ‘Today I discovered that AI ___.’ See you on the next mission!"
-            }
-          ],
-          "visual": "Recap cards, badge animation, and preview of the activity. End with the course progress map moving forward one step.",
-          "isPause": false
-        }
-      ],
-      "activity": {
-        "title": "Mystery Picture Sort",
-        "purpose": "Practise image classification through a concrete, child-led task.",
-        "time": "10–12 min",
-        "steps": [
-          "Place the Cat, Dog and Unsure signs on a table.",
-          "Sort the first six clear pictures and say one clue for each choice.",
-          "Sort six tricky pictures with shadows, costumes or partial views.",
-          "Move any uncertain picture to Unsure instead of guessing.",
-          "Compare choices and write one rule that would help Pip."
+      "hook": "Show one clear animal card and one cropped or shadowed version. Ask: “What clues stayed the same?” Do not define image classification yet.",
+      "watchFocus": "Pause mentally whenever Pip makes a choice. Learners should look for the clue behind the choice, not only the answer.",
+      "video": {
+        "src": "/videos/ai-detective-academy/picture-clue-patrol.mp4",
+        "poster": "lesson-posters/picture-clue-patrol.webp",
+        "durationSeconds": 188
+      },
+      "concept": {
+        "bigIdea": "It places a picture into a category.",
+        "vocabulary": [
+          "image",
+          "feature",
+          "label",
+          "classification",
+          "prediction",
+          "unsure"
+        ],
+        "objectives": [
+          "Define image classification in child-friendly language.",
+          "Use at least two visible features to justify a category.",
+          "Choose “Unsure” when evidence is incomplete and explain why."
         ]
       },
-      "independentMission": "Create one “tricky” animal picture by cropping or covering part of it. Ask another learner to classify it, then reveal which clue was missing.",
+      "activity": {
+        "title": "Mystery Picture Sort",
+        "steps": [
+          "Place Cat, Dog and Unsure category cards on a table or screen.",
+          "Sort six clear animal cards and name one visible clue for each.",
+          "Sort six tricky cards containing shadows, costumes, partial views or unusual angles.",
+          "Move weak-evidence cases to Unsure rather than forcing a guess.",
+          "Write one rule that would help Pip avoid a repeated mistake."
+        ]
+      },
+      "independentMission": "Give the learner a new animal image. Require the sentence: “I chose ___ because I noticed ___ and ___.”",
+      "childMission": "Find a picture of an animal — a book, a magazine, or one you draw yourself. Show it to someone and finish this out loud: “I chose ___ because I noticed ___ and ___.” Two clues, not one!",
       "quiz": [
         {
           "question": "What does image classification do?",
           "options": [
-            "Makes a picture louder",
-            "Chooses a category for a picture",
-            "Turns every picture into a cartoon"
+            "It places a picture into a category.",
+            "It makes the picture bigger and clearer.",
+            "It understands the picture the way you do."
           ],
-          "answer": "Chooses a category for a picture",
-          "explanation": "Classification assigns a label or category."
+          "answer": "It places a picture into a category.",
+          "explanation": "This is the central concept of the lesson."
         },
         {
-          "question": "Which is a visual feature?",
+          "question": "Why might a cat wearing a costume confuse a classifier?",
           "options": [
-            "The shape of an ear",
-            "The animal’s birthday",
-            "The name of the folder owner"
+            "The costume may create misleading visual features.",
+            "The classifier thinks costumes are funny.",
+            "A costume turns the animal into something else."
           ],
-          "answer": "The shape of an ear",
-          "explanation": "Visible shapes, colors and textures can be used as features."
+          "answer": "The costume may create misleading visual features.",
+          "explanation": "AI can focus on the wrong pattern."
         },
         {
-          "question": "Why might AI mistake a fox for a cat?",
+          "question": "When is “Unsure” the best answer?",
           "options": [
-            "They may share visible patterns",
-            "AI is trying to be funny",
-            "Foxes are secretly cats"
+            "When the picture does not provide enough reliable evidence.",
+            "When you want to finish quickly.",
+            "Never — you should always pick an answer."
           ],
-          "answer": "They may share visible patterns",
-          "explanation": "Similar ears, fur and face shapes can confuse a pattern matcher."
+          "answer": "When the picture does not provide enough reliable evidence.",
+          "explanation": "Responsible systems should not invent certainty."
         },
         {
-          "question": "What should we do when the picture is too unclear?",
+          "question": "Is one feature always enough?",
           "options": [
-            "Guess quickly",
-            "Use an Unsure option or ask for more information",
-            "Delete every category"
+            "No. Several relevant clues are often needed.",
+            "Yes, if it is a really good clue.",
+            "Yes, as long as the picture is clear."
           ],
-          "answer": "Use an Unsure option or ask for more information",
-          "explanation": "Responsible systems can admit uncertainty."
+          "answer": "No. Several relevant clues are often needed.",
+          "explanation": "Single-feature rules are fragile."
         },
         {
-          "question": "Does AI understand a cat exactly like a child does?",
+          "question": "What should we do after an incorrect prediction?",
           "options": [
-            "Yes, always",
-            "No, it mainly matches patterns",
-            "Only on Tuesdays"
+            "Check the clues, question the rule and improve it.",
+            "Decide the AI is broken and stop using it.",
+            "Ignore it — one mistake does not matter."
           ],
-          "answer": "No, it mainly matches patterns",
-          "explanation": "The system processes patterns rather than human meaning."
+          "answer": "Check the clues, question the rule and improve it.",
+          "explanation": "Errors are evidence for improvement."
         }
       ],
-      "differentiation": {
-        "explorer": "Use six large picture cards and only two categories plus Unsure. Let children point and speak rather than write.",
-        "builder": "Use all 12 cards and require two clues for tricky choices.",
-        "creator": "Add adversarial examples, confidence scores and a short discussion about training-set diversity."
+      "adaptation": {
+        "younger": "use only picture cards and oral explanations.",
+        "older": "compare a hand-written rule with a real classifier and discuss confidence scores."
       },
-      "misconception": "AI is not looking with a mind or understanding the animal. It is matching numerical patterns, and unusual lighting or angles can confuse it.",
-      "parentSummary": "Your child practised evidence-based sorting and learned that computer vision can be useful without being perfect.",
-      "productionAssets": [
-        "Pip robot character",
-        "Pixel Pet Shelter background",
-        "Animal card set",
-        "Three folder icons",
-        "Pixel Detective badge"
-      ]
+      "parentTakeaway": "The learner practises evidence-based sorting and learns that computer vision can be useful without being perfect.",
+      "badgeId": "ai-detective-academy-picture-clue-patrol",
+      "xpReward": 60,
+      "learnerTime": "30–38 minutes"
     },
     {
       "id": "sound-safari",
       "number": 2,
       "title": "Sound Safari: How Does AI Hear?",
-      "mission": "Match mystery sounds to the correct source.",
-      "concept": "audio recognition",
-      "badgeId": "sound-scout",
-      "learnerTime": "30–45 minutes",
-      "xpReward": 60,
-      "objectives": [
-        "Name three useful sound features.",
-        "Explain why noise can change a prediction.",
-        "Choose a safe response when speech is unclear."
-      ],
-      "vocabulary": [
-        "sound wave",
-        "pitch",
-        "rhythm",
-        "noise",
-        "speech recognition"
-      ],
-      "materials": [
-        "Six safe sound clips or tutor-made sound effects",
-        "Sound Safari recording sheet",
-        "Headphones if available"
-      ],
-      "components": [
-        {
-          "name": "Lesson video",
-          "time": "10 min",
-          "purpose": "Story, concept explanation and guided pauses"
-        },
-        {
-          "name": "Eyes-Closed Sound Hunt",
-          "time": "10–12 min",
-          "purpose": "Hands-on or interactive practice"
-        },
-        {
-          "name": "Independent mission",
-          "time": "8–12 min",
-          "purpose": "Apply the concept without step-by-step help"
-        },
-        {
-          "name": "Quiz and reflection",
-          "time": "5 min",
-          "purpose": "Check understanding and explain one key idea"
-        }
-      ],
-      "scenes": [
-        {
-          "id": "cold-open",
-          "label": "Cold open",
-          "time": "0:00–0:50",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Could you recognize rain, applause or a lion without seeing anything? Meet Pip, our curious robot, and Glitch, a tiny bug who loves making silly mistakes. Today your mission is match mystery sounds to the correct source. Watch carefully, because the first clue appears before the countdown reaches zero. Ready? Three, two, one — mission start!"
-            }
-          ],
-          "visual": "Fast animated opening. Show a dark screen with animated sound waves and three mystery icons. Display mission badge: Sound Scout.",
-          "isPause": false
-        },
-        {
-          "id": "mission-briefing",
-          "label": "Mission briefing",
-          "time": "0:50–1:45",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Here is the problem. The Jungle Radio has lost all its labels. Pip hears chirps, roars, splashes and machines, but the sound files are mixed together. Pip cannot solve it alone, because AI needs clear information and careful testing. Your job is not only to find an answer. Your job is to explain how you know. That is what real AI detectives and creators do."
-            }
-          ],
-          "visual": "Introduce the story setting: the Jungle Radio sound station. Show Pip looking puzzled and a simple mission map.",
-          "isPause": false
-        },
-        {
-          "id": "try-before-telling",
-          "label": "Try before telling",
-          "time": "1:45–3:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Before I explain anything, try this. Close your eyes and listen to three short sound descriptions or recordings. Which clue tells you whether the sound is natural, human-made or an animal? Pause the video for thirty seconds. Make your choice, point to it, or write it down. Welcome back. Did you notice that you used clues rather than magic? You looked for patterns, compared possibilities, and made a decision."
-            }
-          ],
-          "visual": "Show the learner prompt with a 30-second countdown. Use large icons and very little text. Animate waveforms while the source stays hidden.",
-          "isPause": true
-        },
-        {
-          "id": "the-big-ai-idea",
-          "label": "The big AI idea",
-          "time": "3:00–4:35",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "The big idea today is audio recognition. Audio recognition compares patterns in sound. Useful clues include pitch, rhythm, loudness, length and repeated sound shapes. Speech recognition focuses on patterns that represent spoken words. AI does not understand the world exactly as a person does. It follows patterns found in examples, rules, or signals. That can be useful, but it also means we must check its work."
-            }
-          ],
-          "visual": "Animate the concept using three simple steps: sound wave enters, sound features are measured, source or word is predicted. Highlight the key word audio recognition.",
-          "isPause": false
-        },
-        {
-          "id": "worked-example",
-          "label": "Worked example",
-          "time": "4:35–6:05",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Let us solve one together. A short “tap-tap-tap” could be rain, typing or footsteps. We listen for speed, background sound and whether the taps are sharp or soft. One clue is rarely enough, so we combine several. First, we collect the clues. Next, we compare them. Then, we make a choice and test it. If the answer is wrong, we do not say, ‘The robot is bad.’ We ask, ‘Which clue, example, or rule needs improving?’"
-            }
-          ],
-          "visual": "Step-by-step demonstration with check marks. Show three waveforms and icons for pitch, rhythm and background noise.",
-          "isPause": false
-        },
-        {
-          "id": "your-turn",
-          "label": "Your turn",
-          "time": "6:05–7:30",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Now it is your turn. Decide whether a noisy recording says “cat,” “cap,” or “can.” Explain what extra information would make the answer safer. Pause for up to one minute. When you return, say your answer aloud using this sentence: ‘I chose ___ because ___.’ Welcome back. A strong answer includes both the choice and the reason."
-            }
-          ],
-          "visual": "Display three choices and a one-minute pause screen. Three speech bubbles and a “play again” button.",
-          "isPause": true
-        },
-        {
-          "id": "glitch-alert",
-          "label": "Glitch alert",
-          "time": "7:30–8:55",
-          "turns": [
-            {
-              "speaker": "glitch",
-              "text": "I know! The AI answer must always be correct!"
-            },
-            {
-              "speaker": "tutor",
-              "text": "Glitch, that is today’s trap. A microphone does not give AI perfect hearing. Noise, accents, distance and similar-sounding words can change the result. We should be curious, not afraid, when an AI makes a mistake. A mistake is a clue that helps us improve the data, the rule, or the way a person uses the tool."
-            }
-          ],
-          "visual": "Glitch confidently gives a wrong answer; freeze-frame with a playful buzzer. Show ‘Check, Question, Improve.’",
-          "isPause": false
-        },
-        {
-          "id": "recap-and-badge",
-          "label": "Recap and badge",
-          "time": "8:55–10:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Mission complete. Today you learned three things. One: sound has patterns such as pitch and rhythm. Two: several sounds can share similar clues. Three: replaying or asking for confirmation can reduce mistakes. Your next task is the Eyes-Closed Sound Hunt. Complete it to earn the Sound Scout badge. Before you go, tell someone at home: ‘Today I discovered that AI ___.’ See you on the next mission!"
-            }
-          ],
-          "visual": "Recap cards, badge animation, and preview of the activity. End with the course progress map moving forward one step.",
-          "isPause": false
-        }
-      ],
+      "hook": "Ask learners to close their eyes while the tutor makes a safe sound, such as tapping a pencil or shaking keys. Ask for two clues before revealing the source.",
+      "watchFocus": "Listen for the difference between recognizing a pattern and understanding the real-world situation.",
+      "video": {
+        "src": "/videos/ai-detective-academy/sound-safari.mp4",
+        "poster": "lesson-posters/sound-safari.webp",
+        "durationSeconds": 111
+      },
+      "concept": {
+        "bigIdea": "How high or low a sound is.",
+        "vocabulary": [
+          "sound wave",
+          "pitch",
+          "rhythm",
+          "loudness",
+          "noise",
+          "speech recognition"
+        ],
+        "objectives": [
+          "Name pitch, rhythm and loudness as useful sound features.",
+          "Explain how background noise can change a prediction.",
+          "Choose a safe confirmation response when speech is unclear."
+        ]
+      },
       "activity": {
         "title": "Eyes-Closed Sound Hunt",
-        "purpose": "Practise audio recognition through a concrete, child-led task.",
-        "time": "10–12 min",
         "steps": [
-          "Play or make one sound while learners close their eyes.",
-          "Learners choose a source and record two clues.",
-          "Reveal the source and compare the useful clues.",
-          "Add background noise and repeat one sound.",
-          "Discuss which confirmation question a voice assistant should ask."
+          "Play or make six safe sounds one at a time.",
+          "For each sound, record the guessed source and two clues.",
+          "Replay one sound with background noise added.",
+          "Compare which features remained useful and which became unclear.",
+          "Write a confirmation question a voice assistant should ask instead of guessing."
         ]
       },
-      "independentMission": "Record two similar sounds, such as tapping a desk and tapping a box. Ask someone to tell them apart and list the strongest clue.",
+      "independentMission": "Create a three-clue “sound riddle” for a partner without naming the source.",
+      "childMission": "Make a sound riddle. Think of a sound, then give someone three clues about it — how high or low it is, its rhythm, how loud it is — without naming what makes it. Can they guess?",
       "quiz": [
         {
-          "question": "Which feature describes how high or low a sound is?",
+          "question": "What is pitch?",
           "options": [
-            "Pitch",
-            "Color",
-            "Weight"
+            "How high or low a sound is.",
+            "How loud or quiet a sound is.",
+            "How long a sound lasts."
           ],
-          "answer": "Pitch",
-          "explanation": "Pitch describes perceived highness or lowness."
+          "answer": "How high or low a sound is.",
+          "explanation": "Pitch is one measurable audio feature."
         },
         {
-          "question": "What can make speech recognition harder?",
+          "question": "What can background noise do?",
           "options": [
-            "Background noise",
-            "A clear microphone",
-            "Repeating slowly"
+            "Hide or distort useful sound patterns.",
+            "Make the computer listen harder.",
+            "Nothing — computers filter it out perfectly."
           ],
-          "answer": "Background noise",
-          "explanation": "Noise can cover or distort important sound patterns."
+          "answer": "Hide or distort useful sound patterns.",
+          "explanation": "Noise can lower reliability."
         },
         {
-          "question": "What is a safe response to an unclear command?",
+          "question": "Should a voice assistant act when it is unsure?",
           "options": [
-            "Pretend to understand",
-            "Ask the person to repeat or confirm",
-            "Choose a random action"
+            "It should ask for confirmation first.",
+            "It should guess the most likely thing.",
+            "It should act anyway — it is usually right."
           ],
-          "answer": "Ask the person to repeat or confirm",
-          "explanation": "Confirmation prevents risky guesses."
+          "answer": "It should ask for confirmation first.",
+          "explanation": "Confirmation prevents harmful mistakes."
         },
         {
-          "question": "Why can “cat” and “cap” be confused?",
+          "question": "Name another useful sound feature.",
           "options": [
-            "Their sound patterns are similar",
-            "They have the same meaning",
-            "Microphones prefer hats"
+            "Rhythm or loudness.",
+            "The meaning of the words.",
+            "How much the listener enjoys it."
           ],
-          "answer": "Their sound patterns are similar",
-          "explanation": "Only the final sound differs."
+          "answer": "Rhythm or loudness.",
+          "explanation": "Multiple features improve comparison."
         },
         {
-          "question": "Does louder always mean easier to recognize?",
+          "question": "Does a waveform mean the computer understands the sound like a person?",
           "options": [
-            "Yes",
-            "No, distortion can also increase",
-            "Only for animal sounds"
+            "No. It measures patterns in the signal.",
+            "Yes — a waveform is how hearing works.",
+            "Yes, once it has heard enough sounds."
           ],
-          "answer": "No, distortion can also increase",
-          "explanation": "Very loud audio may clip and lose detail."
+          "answer": "No. It measures patterns in the signal.",
+          "explanation": "Pattern recognition is not human understanding."
         }
       ],
-      "differentiation": {
-        "explorer": "Use familiar animal and household sounds; answer by holding up picture cards.",
-        "builder": "Add pitch, rhythm and noise vocabulary and a simple evidence table.",
-        "creator": "Introduce spectrograms, accent diversity and false activation in voice assistants."
+      "adaptation": {
+        "younger": "use live sound guessing and picture choices.",
+        "older": "view simple waveforms and compare amplitude, frequency and noise."
       },
-      "misconception": "A microphone does not give AI perfect hearing. Noise, accents, distance and similar-sounding words can change the result.",
-      "parentSummary": "Your child explored how machines recognize sound and why voice systems should ask for confirmation when uncertain.",
-      "productionAssets": [
-        "Jungle Radio background",
-        "Animated waveforms",
-        "Sound-source icons",
-        "Replay button graphic",
-        "Sound Scout badge"
-      ]
+      "parentTakeaway": "The learner explores how machines recognize sounds and why uncertain voice systems should ask for confirmation.",
+      "badgeId": "ai-detective-academy-sound-safari",
+      "xpReward": 60,
+      "learnerTime": "30–38 minutes"
     },
     {
-      "id": "human-or-machine",
+      "id": "creative-clues",
       "number": 3,
-      "title": "Human or Machine? The Creative Clue Game",
-      "mission": "Investigate whether a picture, sentence or tune came from a person or a machine.",
-      "concept": "source evaluation",
-      "badgeId": "source-sleuth",
-      "learnerTime": "30–45 minutes",
-      "xpReward": 60,
-      "objectives": [
-        "Distinguish weak style clues from stronger source evidence.",
-        "Use sure, likely and unsure appropriately.",
-        "Explain why false accusations can be harmful."
-      ],
-      "vocabulary": [
-        "source",
-        "evidence",
-        "metadata",
-        "confidence",
-        "generated"
-      ],
-      "materials": [
-        "Six teacher-prepared creations with known sources",
-        "Confidence cards: Sure, Likely, Unsure",
-        "Clue request sheet"
-      ],
-      "components": [
-        {
-          "name": "Lesson video",
-          "time": "10 min",
-          "purpose": "Story, concept explanation and guided pauses"
-        },
-        {
-          "name": "Gallery Source Investigation",
-          "time": "12–15 min",
-          "purpose": "Hands-on or interactive practice"
-        },
-        {
-          "name": "Independent mission",
-          "time": "8–12 min",
-          "purpose": "Apply the concept without step-by-step help"
-        },
-        {
-          "name": "Quiz and reflection",
-          "time": "5 min",
-          "purpose": "Check understanding and explain one key idea"
-        }
-      ],
-      "scenes": [
-        {
-          "id": "cold-open",
-          "label": "Cold open",
-          "time": "0:00–0:50",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Can you always tell whether a person or a computer created something? Meet Pip, our curious robot, and Glitch, a tiny bug who loves making silly mistakes. Today your mission is investigate whether a picture, sentence or tune came from a person or a machine. Watch carefully, because the first clue appears before the countdown reaches zero. Ready? Three, two, one — mission start!"
-            }
-          ],
-          "visual": "Fast animated opening. Show two mystery doors labelled Human and Machine with art, text and music clues floating between them. Display mission badge: Source Sleuth.",
-          "isPause": false
-        },
-        {
-          "id": "mission-briefing",
-          "label": "Mission briefing",
-          "time": "0:50–1:45",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Here is the problem. The Academy gallery has received six anonymous creations. The curator wants labels, but some clues are misleading and there may not be enough evidence. Pip cannot solve it alone, because AI needs clear information and careful testing. Your job is not only to find an answer. Your job is to explain how you know. That is what real AI detectives and creators do."
-            }
-          ],
-          "visual": "Introduce the story setting: the Mystery Makers Gallery. Show Pip looking puzzled and a simple mission map.",
-          "isPause": false
-        },
-        {
-          "id": "try-before-telling",
-          "label": "Try before telling",
-          "time": "1:45–3:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Before I explain anything, try this. Read two tiny stories. Which one feels more likely to be machine-made, and what evidence supports your guess? Remember that “strange” does not automatically mean “AI.” Pause the video for thirty seconds. Make your choice, point to it, or write it down. Welcome back. Did you notice that you used clues rather than magic? You looked for patterns, compared possibilities, and made a decision."
-            }
-          ],
-          "visual": "Show the learner prompt with a 30-second countdown. Use large icons and very little text. Show two short original sentences with clue magnifiers.",
-          "isPause": true
-        },
-        {
-          "id": "the-big-ai-idea",
-          "label": "The big AI idea",
-          "time": "3:00–4:35",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "The big idea today is source evaluation. Source evaluation means checking where something came from and how reliable the evidence is. Style clues can help, but metadata, creator statements and the creation process are stronger than guessing from appearance alone. AI does not understand the world exactly as a person does. It follows patterns found in examples, rules, or signals. That can be useful, but it also means we must check its work."
-            }
-          ],
-          "visual": "Animate the concept using three simple steps: observe the item, inspect source clues, choose a confidence level. Highlight the key word source evaluation.",
-          "isPause": false
-        },
-        {
-          "id": "worked-example",
-          "label": "Worked example",
-          "time": "4:35–6:05",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Let us solve one together. A perfect-looking landscape could be painted, photographed or generated. Repeated fingers in a character drawing may be a clue, but a human can also make mistakes. We mark our conclusion as sure, likely or unsure and name the evidence. First, we collect the clues. Next, we compare them. Then, we make a choice and test it. If the answer is wrong, we do not say, ‘The robot is bad.’ We ask, ‘Which clue, example, or rule needs improving?’"
-            }
-          ],
-          "visual": "Step-by-step demonstration with check marks. Use a three-level confidence meter and reveal progressively stronger evidence.",
-          "isPause": false
-        },
-        {
-          "id": "your-turn",
-          "label": "Your turn",
-          "time": "6:05–7:30",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Now it is your turn. Examine a poem with repeated phrases. Decide whether you are sure, likely or unsure about its source, then request one stronger clue. Pause for up to one minute. When you return, say your answer aloud using this sentence: ‘I chose ___ because ___.’ Welcome back. A strong answer includes both the choice and the reason."
-            }
-          ],
-          "visual": "Display three choices and a one-minute pause screen. Confidence buttons plus options: author note, file history, original sketch.",
-          "isPause": true
-        },
-        {
-          "id": "glitch-alert",
-          "label": "Glitch alert",
-          "time": "7:30–8:55",
-          "turns": [
-            {
-              "speaker": "glitch",
-              "text": "I know! The AI answer must always be correct!"
-            },
-            {
-              "speaker": "tutor",
-              "text": "Glitch, that is today’s trap. There is no single magical clue that proves something was made by AI. Responsible detectives avoid accusing a creator without reliable evidence. We should be curious, not afraid, when an AI makes a mistake. A mistake is a clue that helps us improve the data, the rule, or the way a person uses the tool."
-            }
-          ],
-          "visual": "Glitch confidently gives a wrong answer; freeze-frame with a playful buzzer. Show ‘Check, Question, Improve.’",
-          "isPause": false
-        },
-        {
-          "id": "recap-and-badge",
-          "label": "Recap and badge",
-          "time": "8:55–10:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Mission complete. Today you learned three things. One: appearance alone may not reveal the creator. Two: strong source evidence is better than a feeling. Three: uncertainty should be stated honestly. Your next task is the Gallery Source Investigation. Complete it to earn the Source Sleuth badge. Before you go, tell someone at home: ‘Today I discovered that AI ___.’ See you on the next mission!"
-            }
-          ],
-          "visual": "Recap cards, badge animation, and preview of the activity. End with the course progress map moving forward one step.",
-          "isPause": false
-        }
-      ],
-      "activity": {
-        "title": "Gallery Source Investigation",
-        "purpose": "Practise source evaluation through a concrete, child-led task.",
-        "time": "12–15 min",
-        "steps": [
-          "Inspect one creation without source information.",
-          "Record a first guess and confidence level.",
-          "Reveal a style clue, then a process clue.",
-          "Update the conclusion if the evidence changes.",
-          "Write one rule for making a fair source claim."
+      "title": "Creative Clues: Human or Machine?",
+      "hook": "Show an unfamiliar picture and ask learners to guess who or what made it. Then ask: “What evidence do we actually have?”",
+      "watchFocus": "Notice how conclusions change when source, process or metadata evidence is added.",
+      "video": {
+        "src": "/videos/ai-detective-academy/creative-clues.mp4",
+        "poster": "lesson-posters/creative-clues.webp",
+        "durationSeconds": 119
+      },
+      "concept": {
+        "bigIdea": "No. Style alone is weak evidence.",
+        "vocabulary": [
+          "source",
+          "evidence",
+          "metadata",
+          "process",
+          "confidence",
+          "generated"
+        ],
+        "objectives": [
+          "Distinguish weak style clues from stronger source evidence.",
+          "Use Sure, Likely and Unsure honestly.",
+          "Explain why accusing a creator without evidence can be harmful."
         ]
       },
-      "independentMission": "Create a drawing or paragraph that intentionally looks “machine-like.” Use it to demonstrate why style alone is weak evidence.",
+      "activity": {
+        "title": "Gallery Source Investigation",
+        "steps": [
+          "Inspect a teacher-prepared creation without source information.",
+          "Record a first guess and confidence level.",
+          "Reveal one style clue, then one process clue, then a source record.",
+          "Allow learners to update their conclusion after each clue.",
+          "Write a fair claim that separates evidence from guesswork."
+        ]
+      },
+      "independentMission": "Rewrite “AI definitely made this” as a careful evidence-based statement.",
+      "childMission": "Someone says “AI definitely made this!” Say it again, but carefully, like a detective. Start with “It might be, because…” and give a real reason.",
       "quiz": [
         {
-          "question": "Which is the strongest source clue?",
+          "question": "Is visual style proof that AI made something?",
           "options": [
-            "It looks unusual",
-            "The original file history and creator record",
-            "A friend guessed AI"
+            "No. Style alone is weak evidence.",
+            "Yes — AI work always looks the same.",
+            "Yes, if it looks too perfect."
           ],
-          "answer": "The original file history and creator record",
-          "explanation": "Process and provenance evidence are stronger than appearance."
+          "answer": "No. Style alone is weak evidence.",
+          "explanation": "Humans and tools can produce similar styles."
         },
         {
-          "question": "What should you say when evidence is weak?",
+          "question": "Which evidence is stronger: “it looks strange” or a verified creation record?",
           "options": [
-            "I am completely sure",
-            "I am unsure and need more evidence",
-            "The creator is lying"
+            "A verified creation record.",
+            "“It looks strange” — your eyes do not lie.",
+            "They are equally strong."
           ],
-          "answer": "I am unsure and need more evidence",
-          "explanation": "Honest uncertainty avoids unfair claims."
+          "answer": "A verified creation record.",
+          "explanation": "Source evidence is more reliable than appearance."
         },
         {
-          "question": "Can humans make strange mistakes?",
+          "question": "What should you say when evidence is incomplete?",
           "options": [
-            "Yes",
-            "No",
-            "Only in music"
+            "Likely or Unsure, with a reason.",
+            "Say you are certain, so people believe you.",
+            "Say nothing at all."
           ],
-          "answer": "Yes",
-          "explanation": "Human work can also contain repetition or errors."
+          "answer": "Likely or Unsure, with a reason.",
+          "explanation": "Confidence should match evidence."
         },
         {
-          "question": "What does confidence describe?",
+          "question": "Why can a false accusation cause harm?",
           "options": [
-            "How loudly you speak",
-            "How certain the conclusion is",
-            "How colorful the picture is"
+            "It can unfairly damage a person’s work or reputation.",
+            "It slows the computer down.",
+            "It does not — you can say sorry afterwards."
           ],
-          "answer": "How certain the conclusion is",
-          "explanation": "Confidence communicates certainty."
+          "answer": "It can unfairly damage a person’s work or reputation.",
+          "explanation": "Responsible claims affect real people."
         },
         {
-          "question": "Why avoid accusing someone without evidence?",
+          "question": "Can your conclusion change after new evidence?",
           "options": [
-            "It may be unfair and harmful",
-            "It makes the gallery too quiet",
-            "AI never creates anything"
+            "Yes. Good investigators update their view.",
+            "No — changing your mind means you were careless.",
+            "Only if somebody tells you to."
           ],
-          "answer": "It may be unfair and harmful",
-          "explanation": "Claims about authorship affect trust and reputation."
+          "answer": "Yes. Good investigators update their view.",
+          "explanation": "Changing with evidence is a strength."
         }
       ],
-      "differentiation": {
-        "explorer": "Use drawings and simple confidence faces: sure, maybe, not sure.",
-        "builder": "Use mixed media and require one observation plus one source clue.",
-        "creator": "Discuss provenance, watermarks, metadata limits and false-positive detection."
+      "adaptation": {
+        "younger": "use “guess” and “know” cards.",
+        "older": "discuss metadata limits, provenance and manipulated evidence."
       },
-      "misconception": "There is no single magical clue that proves something was made by AI. Responsible detectives avoid accusing a creator without reliable evidence.",
-      "parentSummary": "Your child learned not to make confident claims about AI authorship from appearance alone.",
-      "productionAssets": [
-        "Mystery gallery background",
-        "Human/Machine doors",
-        "Confidence meter",
-        "Evidence cards",
-        "Source Sleuth badge"
-      ]
+      "parentTakeaway": "The learner practises fair source evaluation and avoids claiming AI authorship from appearance alone.",
+      "badgeId": "ai-detective-academy-creative-clues",
+      "xpReward": 60,
+      "learnerTime": "30–38 minutes"
     },
     {
       "id": "glitch-hunt",
       "number": 4,
       "title": "Glitch Hunt: Why AI Makes Mistakes",
-      "mission": "Find the cause of three funny AI failures and propose a fix.",
-      "concept": "error analysis",
-      "badgeId": "glitch-buster",
-      "learnerTime": "30–45 minutes",
-      "xpReward": 60,
-      "objectives": [
-        "Use an error-analysis cycle.",
-        "Match common errors to possible causes.",
-        "Explain why test examples should be separate."
-      ],
-      "vocabulary": [
-        "error",
-        "cause",
-        "hypothesis",
-        "test set",
-        "improve"
-      ],
-      "materials": [
-        "Three Glitch Case cards",
-        "Cause and Fix cards",
-        "Simple test record"
-      ],
-      "components": [
-        {
-          "name": "Lesson video",
-          "time": "10 min",
-          "purpose": "Story, concept explanation and guided pauses"
-        },
-        {
-          "name": "Glitch Case Files",
-          "time": "12–15 min",
-          "purpose": "Hands-on or interactive practice"
-        },
-        {
-          "name": "Independent mission",
-          "time": "8–12 min",
-          "purpose": "Apply the concept without step-by-step help"
-        },
-        {
-          "name": "Quiz and reflection",
-          "time": "5 min",
-          "purpose": "Check understanding and explain one key idea"
-        }
-      ],
-      "scenes": [
-        {
-          "id": "cold-open",
-          "label": "Cold open",
-          "time": "0:00–0:50",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Why might an AI call a muffin a puppy or send a robot vacuum toward a dark rug? Meet Pip, our curious robot, and Glitch, a tiny bug who loves making silly mistakes. Today your mission is find the cause of three funny AI failures and propose a fix. Watch carefully, because the first clue appears before the countdown reaches zero. Ready? Three, two, one — mission start!"
-            }
-          ],
-          "visual": "Fast animated opening. Show a muffin labelled puppy and a robot vacuum stopping at a dark rug. Display mission badge: Glitch Buster.",
-          "isPause": false
-        },
-        {
-          "id": "mission-briefing",
-          "label": "Mission briefing",
-          "time": "0:50–1:45",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Here is the problem. Glitch has scrambled the Academy systems. The picture sorter, voice helper and route robot are each failing for a different reason. Pip cannot solve it alone, because AI needs clear information and careful testing. Your job is not only to find an answer. Your job is to explain how you know. That is what real AI detectives and creators do."
-            }
-          ],
-          "visual": "Introduce the story setting: the Academy Glitch Lab. Show Pip looking puzzled and a simple mission map.",
-          "isPause": false
-        },
-        {
-          "id": "try-before-telling",
-          "label": "Try before telling",
-          "time": "1:45–3:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Before I explain anything, try this. Match each failure to a possible cause: poor examples, unclear input, or a rule that does not fit the situation. Pause the video for thirty seconds. Make your choice, point to it, or write it down. Welcome back. Did you notice that you used clues rather than magic? You looked for patterns, compared possibilities, and made a decision."
-            }
-          ],
-          "visual": "Show the learner prompt with a 30-second countdown. Use large icons and very little text. Three error cards and three cause cards for matching.",
-          "isPause": true
-        },
-        {
-          "id": "the-big-ai-idea",
-          "label": "The big AI idea",
-          "time": "3:00–4:35",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "The big idea today is error analysis. Error analysis means studying a wrong result to understand its cause. We inspect the input, training examples, labels, rules and testing conditions instead of changing everything at once. AI does not understand the world exactly as a person does. It follows patterns found in examples, rules, or signals. That can be useful, but it also means we must check its work."
-            }
-          ],
-          "visual": "Animate the concept using three simple steps: observe the error, form a cause hypothesis, test one improvement. Highlight the key word error analysis.",
-          "isPause": false
-        },
-        {
-          "id": "worked-example",
-          "label": "Worked example",
-          "time": "4:35–6:05",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Let us solve one together. The sorter calls a blueberry muffin a puppy because many training pictures show round brown puppy faces and round brown muffins. We add varied examples and a clue about texture, then test on new pictures rather than the same ones. First, we collect the clues. Next, we compare them. Then, we make a choice and test it. If the answer is wrong, we do not say, ‘The robot is bad.’ We ask, ‘Which clue, example, or rule needs improving?’"
-            }
-          ],
-          "visual": "Step-by-step demonstration with check marks. Show before-and-after example sets and a separate test folder.",
-          "isPause": false
-        },
-        {
-          "id": "your-turn",
-          "label": "Your turn",
-          "time": "6:05–7:30",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Now it is your turn. A voice helper keeps hearing “play” when the learner says “plane.” Choose one change to test first and explain why. Pause for up to one minute. When you return, say your answer aloud using this sentence: ‘I chose ___ because ___.’ Welcome back. A strong answer includes both the choice and the reason."
-            }
-          ],
-          "visual": "Display three choices and a one-minute pause screen. Options: reduce noise, add random pictures, change screen color.",
-          "isPause": true
-        },
-        {
-          "id": "glitch-alert",
-          "label": "Glitch alert",
-          "time": "7:30–8:55",
-          "turns": [
-            {
-              "speaker": "glitch",
-              "text": "I know! The AI answer must always be correct!"
-            },
-            {
-              "speaker": "tutor",
-              "text": "Glitch, that is today’s trap. A mistake does not prove that all AI is useless, and one correct answer does not prove it is reliable. We need repeated, fair tests. We should be curious, not afraid, when an AI makes a mistake. A mistake is a clue that helps us improve the data, the rule, or the way a person uses the tool."
-            }
-          ],
-          "visual": "Glitch confidently gives a wrong answer; freeze-frame with a playful buzzer. Show ‘Check, Question, Improve.’",
-          "isPause": false
-        },
-        {
-          "id": "recap-and-badge",
-          "label": "Recap and badge",
-          "time": "8:55–10:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Mission complete. Today you learned three things. One: wrong results can have different causes. Two: change one thing and test again. Three: new test examples reveal whether a fix truly works. Your next task is the Glitch Case Files. Complete it to earn the Glitch Buster badge. Before you go, tell someone at home: ‘Today I discovered that AI ___.’ See you on the next mission!"
-            }
-          ],
-          "visual": "Recap cards, badge animation, and preview of the activity. End with the course progress map moving forward one step.",
-          "isPause": false
-        }
-      ],
-      "activity": {
-        "title": "Glitch Case Files",
-        "purpose": "Practise error analysis through a concrete, child-led task.",
-        "time": "12–15 min",
-        "steps": [
-          "Read a case file and circle the wrong result.",
-          "Choose the most likely cause and explain the evidence.",
-          "Select one fix rather than changing everything.",
-          "Predict what should improve after the fix.",
-          "Test with a new example and record the result."
+      "hook": "Show a deliberately wrong sorting result. Ask: “What are three different reasons this could have happened?”",
+      "watchFocus": "Watch for the difference between changing everything and testing one specific fix.",
+      "video": {
+        "src": "/videos/ai-detective-academy/glitch-hunt.mp4",
+        "poster": "lesson-posters/glitch-hunt.webp",
+        "durationSeconds": 63
+      },
+      "concept": {
+        "bigIdea": "Observe and describe the error clearly.",
+        "vocabulary": [
+          "error",
+          "cause",
+          "hypothesis",
+          "test",
+          "fix",
+          "improve"
+        ],
+        "objectives": [
+          "Use a calm error-analysis cycle.",
+          "Match an error to a plausible cause.",
+          "Test one change at a time using a new example."
         ]
       },
-      "independentMission": "Invent a funny AI mistake, then write two possible causes and the first test you would run.",
+      "activity": {
+        "title": "Glitch Case Files",
+        "steps": [
+          "Read one short case and circle the incorrect result.",
+          "Choose the most likely cause: poor examples, unclear input or wrong rule.",
+          "Select one fix only.",
+          "Predict what should improve if the hypothesis is correct.",
+          "Test with a fresh example and record whether the fix worked."
+        ]
+      },
+      "independentMission": "Explain a technology mistake without saying “the computer is stupid.” Use evidence and a possible cause.",
+      "childMission": "Think of a time a phone, tablet or game got something wrong. Explain what happened without saying the computer is stupid — say what the clue was and what might have caused it.",
       "quiz": [
         {
-          "question": "What is the first step in error analysis?",
+          "question": "What is the first step after finding an error?",
           "options": [
-            "Hide the mistake",
-            "Observe exactly what went wrong",
-            "Replace the whole system"
+            "Observe and describe the error clearly.",
+            "Change as many things as possible straight away.",
+            "Hide it so nobody notices."
           ],
-          "answer": "Observe exactly what went wrong",
-          "explanation": "A clear error description guides investigation."
+          "answer": "Observe and describe the error clearly.",
+          "explanation": "A precise problem is easier to investigate."
+        },
+        {
+          "question": "What is a hypothesis?",
+          "options": [
+            "A testable idea about the cause.",
+            "A fact you already know is true.",
+            "A guess you never check."
+          ],
+          "answer": "A testable idea about the cause.",
+          "explanation": "It guides the next experiment."
         },
         {
           "question": "Why change one thing at a time?",
           "options": [
-            "To know which change helped",
-            "Because two is unlucky",
-            "To make testing slower"
+            "So we can tell which change caused the improvement.",
+            "Because computers can only handle one change.",
+            "To make the work take longer."
           ],
-          "answer": "To know which change helped",
-          "explanation": "Controlled changes reveal cause and effect."
+          "answer": "So we can tell which change caused the improvement.",
+          "explanation": "Controlled testing produces useful evidence."
         },
         {
-          "question": "Why use new test examples?",
+          "question": "Should the same examples be used for every test?",
           "options": [
-            "To check whether improvement generalizes",
-            "To make the folder larger",
-            "Old examples disappear"
+            "Use fresh examples as well.",
+            "Yes — the same examples make results easy to compare.",
+            "Yes, as long as there are lots of them."
           ],
-          "answer": "To check whether improvement generalizes",
-          "explanation": "Testing on memorized examples can be misleading."
+          "answer": "Use fresh examples as well.",
+          "explanation": "New cases show whether the fix generalizes."
         },
         {
-          "question": "One correct answer means the system is always reliable.",
+          "question": "What does an error provide?",
           "options": [
-            "True",
-            "False",
-            "Only for robots"
+            "A clue about what may need improvement.",
+            "Proof that AI never works.",
+            "A reason to start again from nothing."
           ],
-          "answer": "False",
-          "explanation": "Reliability requires repeated and varied testing."
-        },
-        {
-          "question": "Which is a possible cause of speech error?",
-          "options": [
-            "Background noise",
-            "A blue button",
-            "The learner’s shoe size"
-          ],
-          "answer": "Background noise",
-          "explanation": "Noise affects the audio signal."
+          "answer": "A clue about what may need improvement.",
+          "explanation": "Mistakes are information, not just failure."
         }
       ],
-      "differentiation": {
-        "explorer": "Use illustrated case cards and act out “wrong result, possible cause, try again.”",
-        "builder": "Use the full cause-fix-test worksheet.",
-        "creator": "Introduce precision, recall, edge cases and controlled experiments."
+      "adaptation": {
+        "younger": "use picture-based cause/fix cards.",
+        "older": "introduce validation data, confounding changes and error categories."
       },
-      "misconception": "A mistake does not prove that all AI is useless, and one correct answer does not prove it is reliable. We need repeated, fair tests.",
-      "parentSummary": "Your child learned a calm, scientific way to investigate technology mistakes instead of simply trusting or rejecting the system.",
-      "productionAssets": [
-        "Glitch Lab background",
-        "Three error animations",
-        "Cause/Fix cards",
-        "Test folders",
-        "Glitch Buster badge"
-      ]
+      "parentTakeaway": "The learner uses a scientific routine to investigate mistakes instead of automatically trusting or rejecting technology.",
+      "badgeId": "ai-detective-academy-glitch-hunt",
+      "xpReward": 60,
+      "learnerTime": "30–38 minutes"
     },
     {
-      "id": "build-the-picture-detective",
+      "id": "ai-detective",
       "number": 5,
-      "title": "Build the Picture Detective",
-      "mission": "Design and test a paper prototype that classifies imaginary creatures.",
-      "concept": "training and testing a classifier",
-      "badgeId": "chief-ai-detective",
-      "learnerTime": "30–45 minutes",
-      "xpReward": 60,
-      "objectives": [
-        "Create labels and useful features for a classification task.",
-        "Build a simple decision rule or tree.",
-        "Test with unseen and ambiguous examples."
-      ],
-      "vocabulary": [
-        "training data",
-        "test data",
-        "decision rule",
-        "classifier",
-        "unseen example"
-      ],
-      "materials": [
-        "Printable imaginary creature cards",
-        "Feature checklist",
-        "Decision-tree sheet",
-        "Training and Test envelopes"
-      ],
-      "components": [
-        {
-          "name": "Lesson video",
-          "time": "10 min",
-          "purpose": "Story, concept explanation and guided pauses"
-        },
-        {
-          "name": "Creature Classifier Lab",
-          "time": "15–18 min",
-          "purpose": "Hands-on or interactive practice"
-        },
-        {
-          "name": "Independent mission",
-          "time": "8–12 min",
-          "purpose": "Apply the concept without step-by-step help"
-        },
-        {
-          "name": "Quiz and reflection",
-          "time": "5 min",
-          "purpose": "Check understanding and explain one key idea"
-        }
-      ],
-      "scenes": [
-        {
-          "id": "cold-open",
-          "label": "Cold open",
-          "time": "0:00–0:50",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Can you teach a robot to recognize a Fluffalo, a Zingbat and a Moon Muncher? Meet Pip, our curious robot, and Glitch, a tiny bug who loves making silly mistakes. Today your mission is design and test a paper prototype that classifies imaginary creatures. Watch carefully, because the first clue appears before the countdown reaches zero. Ready? Three, two, one — mission start!"
-            }
-          ],
-          "visual": "Fast animated opening. Show three playful imaginary creatures with different horns, wings and spots. Display mission badge: Chief AI Detective.",
-          "isPause": false
-        },
-        {
-          "id": "mission-briefing",
-          "label": "Mission briefing",
-          "time": "0:50–1:45",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Here is the problem. New creatures have arrived from Planet Pattern, but the Academy database has no labels. Pip needs a clear training guide before the doors open. Pip cannot solve it alone, because AI needs clear information and careful testing. Your job is not only to find an answer. Your job is to explain how you know. That is what real AI detectives and creators do."
-            }
-          ],
-          "visual": "Introduce the story setting: Planet Pattern Research Camp. Show Pip looking puzzled and a simple mission map.",
-          "isPause": false
-        },
-        {
-          "id": "try-before-telling",
-          "label": "Try before telling",
-          "time": "1:45–3:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Before I explain anything, try this. Study three creatures and choose the two most useful features for separating them. Are color and size enough? Pause the video for thirty seconds. Make your choice, point to it, or write it down. Welcome back. Did you notice that you used clues rather than magic? You looked for patterns, compared possibilities, and made a decision."
-            }
-          ],
-          "visual": "Show the learner prompt with a 30-second countdown. Use large icons and very little text. Creature cards with feature icons for wings, horns, spots and tail shape.",
-          "isPause": true
-        },
-        {
-          "id": "the-big-ai-idea",
-          "label": "The big AI idea",
-          "time": "3:00–4:35",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "The big idea today is training and testing a classifier. A classifier learns a mapping from features to labels. We prepare labelled training examples, create a decision method, and then test it using new examples that were not used to build the method. AI does not understand the world exactly as a person does. It follows patterns found in examples, rules, or signals. That can be useful, but it also means we must check its work."
-            }
-          ],
-          "visual": "Animate the concept using three simple steps: label training cards, create feature rules, test unseen creatures. Highlight the key word training and testing a classifier.",
-          "isPause": false
-        },
-        {
-          "id": "worked-example",
-          "label": "Worked example",
-          "time": "4:35–6:05",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Let us solve one together. Fluffalos have two round horns and cloud tails. Zingbats have wings and zigzag tails. We test a creature with wings and a cloud tail. The rules conflict, so the safe output is unsure until we decide which feature is more important or collect more examples. First, we collect the clues. Next, we compare them. Then, we make a choice and test it. If the answer is wrong, we do not say, ‘The robot is bad.’ We ask, ‘Which clue, example, or rule needs improving?’"
-            }
-          ],
-          "visual": "Step-by-step demonstration with check marks. Build a simple decision tree and show the conflict reaching Unsure.",
-          "isPause": false
-        },
-        {
-          "id": "your-turn",
-          "label": "Your turn",
-          "time": "6:05–7:30",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Now it is your turn. Classify a new creature using your rule sheet, then trade with a partner who tries to break your rules using a tricky card. Pause for up to one minute. When you return, say your answer aloud using this sentence: ‘I chose ___ because ___.’ Welcome back. A strong answer includes both the choice and the reason."
-            }
-          ],
-          "visual": "Display three choices and a one-minute pause screen. Decision-tree path and a challenge envelope.",
-          "isPause": true
-        },
-        {
-          "id": "glitch-alert",
-          "label": "Glitch alert",
-          "time": "7:30–8:55",
-          "turns": [
-            {
-              "speaker": "glitch",
-              "text": "I know! The AI answer must always be correct!"
-            },
-            {
-              "speaker": "tutor",
-              "text": "Glitch, that is today’s trap. A classifier is not “smart” just because it works on the examples used to design it. The real test is how it handles new and unusual examples. We should be curious, not afraid, when an AI makes a mistake. A mistake is a clue that helps us improve the data, the rule, or the way a person uses the tool."
-            }
-          ],
-          "visual": "Glitch confidently gives a wrong answer; freeze-frame with a playful buzzer. Show ‘Check, Question, Improve.’",
-          "isPause": false
-        },
-        {
-          "id": "recap-and-badge",
-          "label": "Recap and badge",
-          "time": "8:55–10:00",
-          "turns": [
-            {
-              "speaker": "tutor",
-              "text": "Mission complete. Today you learned three things. One: training examples teach the categories. Two: features and labels must be clear. Three: unseen test examples reveal strengths and weaknesses. Your next task is the Creature Classifier Lab. Complete it to earn the Chief AI Detective badge. Before you go, tell someone at home: ‘Today I discovered that AI ___.’ See you on the next mission!"
-            }
-          ],
-          "visual": "Recap cards, badge animation, and preview of the activity. End with the course progress map moving forward one step.",
-          "isPause": false
-        }
-      ],
-      "activity": {
-        "title": "Creature Classifier Lab",
-        "purpose": "Practise training and testing a classifier through a concrete, child-led task.",
-        "time": "15–18 min",
-        "steps": [
-          "Place eight labelled cards in the Training envelope.",
-          "List features that distinguish the three creature types.",
-          "Write a decision tree with an Unsure outcome.",
-          "Open four unseen Test cards and classify them.",
-          "Record errors and improve only one part of the rules."
+      "title": "AI Detective: Build and Test a Classifier",
+      "hook": "Show three imaginary creatures. Let learners invent category names and identify one feature that separates them.",
+      "watchFocus": "Notice that training examples teach the rule, while unseen test examples check whether the rule works beyond memorization.",
+      "video": {
+        "src": "/videos/ai-detective-academy/ai-detective.mp4",
+        "poster": "lesson-posters/ai-detective.webp",
+        "durationSeconds": 89
+      },
+      "concept": {
+        "bigIdea": "To build or learn the classification rule.",
+        "vocabulary": [
+          "training data",
+          "test data",
+          "decision rule",
+          "classifier",
+          "unseen example"
+        ],
+        "objectives": [
+          "Create useful labels and features for a classification task.",
+          "Build a simple decision rule with an Unsure outcome.",
+          "Test the rule on unseen examples and improve one weakness."
         ]
       },
-      "independentMission": "Design one new creature card that exposes a weakness in the current classifier. Explain the weakness and propose a responsible fix.",
+      "activity": {
+        "title": "Creature Classifier Lab",
+        "steps": [
+          "Place eight labelled creature cards in a Training envelope.",
+          "List the features that best separate the creature types.",
+          "Create a short decision tree, including Unsure.",
+          "Open four unseen Test cards and classify them without changing labels mid-test.",
+          "Record errors and improve one part of the decision tree."
+        ]
+      },
+      "independentMission": "Design one tricky creature card that exposes a weakness in the current rule.",
+      "childMission": "Invent one tricky creature that would break your rule. Draw it, then explain which part of the rule it breaks and how you would fix it.",
       "quiz": [
         {
-          "question": "Which examples should be used for the final test?",
+          "question": "What is training data used for?",
           "options": [
-            "Only the training cards",
-            "New cards not used to build the rules",
-            "The easiest card repeated"
+            "To build or learn the classification rule.",
+            "To check how good the finished rule is.",
+            "To store the answers so they can be looked up."
           ],
-          "answer": "New cards not used to build the rules",
-          "explanation": "Unseen data gives a fairer test."
+          "answer": "To build or learn the classification rule.",
+          "explanation": "Training examples shape the classifier."
         },
         {
-          "question": "What is a label?",
+          "question": "What is test data used for?",
           "options": [
-            "The category name",
-            "The picture size",
-            "A sound effect"
+            "To check the rule on new examples.",
+            "To teach the rule in the first place.",
+            "To make the training set bigger."
           ],
-          "answer": "The category name",
-          "explanation": "Labels identify the target category."
+          "answer": "To check the rule on new examples.",
+          "explanation": "Testing measures generalization."
         },
         {
-          "question": "Why include an Unsure result?",
+          "question": "Why keep test cards unseen?",
           "options": [
-            "Some cases do not have enough clear evidence",
-            "It makes every answer wrong",
-            "Robots dislike choices"
+            "To prevent memorizing the answers.",
+            "To keep them clean and undamaged.",
+            "Because there are not enough to share."
           ],
-          "answer": "Some cases do not have enough clear evidence",
+          "answer": "To prevent memorizing the answers.",
+          "explanation": "A fair test must be independent."
+        },
+        {
+          "question": "Why include an Unsure outcome?",
+          "options": [
+            "Some cases do not contain enough clear evidence.",
+            "To let the system avoid hard work.",
+            "Because every question needs three answers."
+          ],
+          "answer": "Some cases do not contain enough clear evidence.",
           "explanation": "Uncertainty is safer than forced guessing."
         },
         {
-          "question": "What should happen after a test error?",
+          "question": "What should be improved after a repeated error?",
           "options": [
-            "Study the cause and improve the rule or examples",
-            "Erase the result",
-            "Claim the test is unfair"
+            "The relevant feature, example or decision rule.",
+            "The screen the results appear on.",
+            "Nothing — repeated errors are normal."
           ],
-          "answer": "Study the cause and improve the rule or examples",
-          "explanation": "Errors guide improvement."
-        },
-        {
-          "question": "A model that remembers training cards but fails on new cards is:",
-          "options": [
-            "Well tested",
-            "Not generalizing well",
-            "Always correct"
-          ],
-          "answer": "Not generalizing well",
-          "explanation": "It has not learned a useful general pattern."
+          "answer": "The relevant feature, example or decision rule.",
+          "explanation": "Targeted improvement is more reliable."
         }
       ],
-      "differentiation": {
-        "explorer": "Tutor reads the rules; children sort six creatures using picture symbols.",
-        "builder": "Children build a simple branching decision tree and test four unseen cards.",
-        "creator": "Add train/validation/test splits and calculate basic accuracy by category."
+      "adaptation": {
+        "younger": "use two creature categories and a simple yes/no rule.",
+        "older": "calculate a confusion matrix and discuss overfitting."
       },
-      "misconception": "A classifier is not “smart” just because it works on the examples used to design it. The real test is how it handles new and unusual examples.",
-      "parentSummary": "Your child completed a full miniature AI workflow: define categories, train with examples, test on new cases and improve responsibly.",
-      "productionAssets": [
-        "Planet Pattern background",
-        "Creature card pack",
-        "Decision-tree graphics",
-        "Training/Test envelopes",
-        "Chief AI Detective badge"
-      ]
+      "parentTakeaway": "The learner completes a miniature AI workflow: define, train, test and improve.",
+      "badgeId": "ai-detective-academy-ai-detective",
+      "xpReward": 60,
+      "learnerTime": "30–38 minutes"
     }
   ],
-  "badgeId": "ai-detective-academy",
-  "completionXp": 100,
+  "capstone": {
+    "id": "mystery-media-lab",
+    "title": "Mystery Media Lab",
+    "time": "30–40 min",
+    "badgeId": "chief-ai-detective",
+    "summary": "Learners investigate one image, one sound and one creative work; classify with evidence, state confidence, diagnose one glitch and improve a rule.",
+    "evidence": "Worksheet, explanation and final design or decision",
+    "tasks": [
+      "Classify one tricky image and one noisy sound using evidence.",
+      "Evaluate the source of one creative work using confidence language.",
+      "Diagnose one incorrect AI result and test a targeted fix.",
+      "Build a simple decision rule and explain one limitation."
+    ],
+    "successStandard": "The learner must explain the reasoning behind the result, not only submit a final answer.",
+    "xpReward": 150
+  },
   "difficulty": "beginner",
   "topics": [
     "Perception",
     "Evidence"
   ],
   "image": "courses/ai-ethics.webp",
-  "accent": "purple",
-  "status": "available"
+  "accent": "purple"
 };
-

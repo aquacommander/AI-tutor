@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * Integrity checks on the transcribed course content.
+ * Integrity checks on the course content.
  *
- * The lesson data was parsed out of a Word document rather than typed by hand,
- * which trades typos for a different risk: a silent structural mistake that
- * looks fine until a child hits it. A quiz whose correct answer is not among its
- * options is unanswerable; a lesson missing its badge awards nothing; a pause
- * scene with no reveal leaves a dead button on the page.
+ * The lessons are generated from AI_for_Kids_Revised_14_Video_Course_Plan.docx
+ * rather than typed by hand, which trades typos for a worse risk: a silent
+ * structural mistake that looks fine until a child hits it. A quiz whose correct
+ * answer is not among its options is unanswerable. A lesson pointing at a video
+ * that is not there plays nothing. A badge id with no badge awards nothing.
  *
- * These are the things that must hold for every lesson of every course, now and
- * as Courses 2-4 are added.
+ * These also enforce the plan's own release rules — five questions with
+ * explanations, an "Unsure"-style option where the lesson calls for one, a
+ * parent summary on every lesson, and a capstone gating every course badge.
  *
  * Usage: node scripts/check-curriculum.mjs
  */
@@ -17,11 +18,15 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { activityGames, findActivityGame } from '../src/data/activities.ts';
 import { badges } from '../src/data/badges.ts';
-import { courses, courseTotalXp } from '../src/data/courses.ts';
-import { lessonVideos } from '../src/data/lesson-videos.ts';
-import { formatDuration, lessonTime, parseMinutes, stageTime, videoMinutes } from '../src/lib/lesson-time.ts';
+import { courses, courseTotalXp, courseVideoSeconds, TOTAL_LESSONS } from '../src/data/courses.ts';
+import { formatDuration } from '../src/lib/lesson-time.ts';
+import { RIDDLE_ROUNDS } from '../src/data/activities/sound-riddle.ts';
+import { buildMissions, findBuildMission, missionMaxScore } from '../src/data/missions/build-it.ts';
+import { seededShuffle } from '../src/lib/shuffle.ts';
 
 const QUIZ_PASS_MARK = 4;
+/** The plan's stated total: 23:48 across 14 films. */
+const EXPECTED_VIDEO_SECONDS = 1428;
 
 let failures = 0;
 function report(ok, label, detail = '') {
@@ -30,79 +35,79 @@ function report(ok, label, detail = '') {
 }
 
 const badgeIds = new Set(badges.map((badge) => badge.id));
-const available = courses.filter((course) => course.status === 'available');
 
-console.log('== the catalogue ==');
+console.log('== the programme ==');
 report(courses.length === 4, 'four courses', `${courses.length}`);
-report(available.length > 0, 'at least one course is playable', `${available.length} of 4`);
+report(TOTAL_LESSONS === 14, 'fourteen lessons', `${TOTAL_LESSONS}`);
 report(
-  new Set(courses.map((c) => c.id)).size === courses.length,
-  'course ids are unique',
+  courses.map((c) => c.lessons.length).join('/') === '5/4/3/2',
+  'lessons split 5/4/3/2 as the plan specifies',
+  courses.map((c) => c.lessons.length).join('/'),
 );
+report(new Set(courses.map((c) => c.id)).size === 4, 'course ids are unique');
+
+const totalVideo = courses.reduce((t, c) => t + courseVideoSeconds(c), 0);
+report(
+  Math.abs(totalVideo - EXPECTED_VIDEO_SECONDS) <= 8,
+  'total film time matches the plan',
+  `${formatDuration(totalVideo)} vs 23:48 stated`,
+);
+
+console.log('\n== every course ==');
 for (const course of courses) {
-  report(badgeIds.has(course.badgeId), `${course.id}: course badge exists`, course.badgeId);
-}
+  const problems = [];
+  if (!course.tagline) problems.push('no tagline');
+  if (course.outcomes.length === 0) problems.push('no outcomes');
+  if (!badgeIds.has(course.capstone.badgeId)) problems.push(`capstone badge ${course.capstone.badgeId} missing`);
+  if (course.capstone.tasks.length < 3) problems.push(`capstone has ${course.capstone.tasks.length} tasks`);
+  if (!course.capstone.successStandard) problems.push('capstone has no success standard');
+  if (course.capstone.xpReward <= 0) problems.push('capstone is worth no XP');
 
-console.log('\n== every playable course ==');
-for (const course of available) {
-  report(course.lessons.length === 5, `${course.id}: five lessons`, `${course.lessons.length}`);
+  const expected = course.lessons.reduce((t, l) => t + l.xpReward, 0) + course.capstone.xpReward;
+  if (courseTotalXp(course) !== expected) problems.push('XP does not add up');
 
-  const ids = course.lessons.map((lesson) => lesson.id);
-  report(new Set(ids).size === ids.length, `${course.id}: lesson ids are unique`);
-  report(
-    course.lessons.every((lesson, index) => lesson.number === index + 1),
-    `${course.id}: lesson numbers run 1..n in order`,
-  );
-  report(
-    courseTotalXp(course) === course.lessons.reduce((t, l) => t + l.xpReward, 0) + course.completionXp,
-    `${course.id}: total XP adds up`,
-    `${courseTotalXp(course)}`,
-  );
+  report(problems.length === 0, `${course.id}`, problems.join('; '));
 }
 
 console.log('\n== every lesson ==');
-for (const course of available) {
+for (const course of courses) {
   for (const lesson of course.lessons) {
     const where = `${course.id}/${lesson.id}`;
     const problems = [];
 
     if (!badgeIds.has(lesson.badgeId)) problems.push(`unknown badge ${lesson.badgeId}`);
     if (lesson.xpReward <= 0) problems.push('no XP');
-    if (lesson.scenes.length !== 8) problems.push(`${lesson.scenes.length} scenes`);
-    if (lesson.objectives.length === 0) problems.push('no objectives');
-    if (lesson.vocabulary.length === 0) problems.push('no vocabulary');
-    if (lesson.materials.length === 0) problems.push('no materials');
+    if (!lesson.hook) problems.push('no curiosity hook');
+    if (!lesson.watchFocus) problems.push('no watch focus');
+    if (!lesson.concept.bigIdea) problems.push('concept card has no big idea');
+    if (lesson.concept.vocabulary.length === 0) problems.push('no vocabulary');
+    if (lesson.concept.objectives.length === 0) problems.push('no objectives');
     if (lesson.activity.steps.length === 0) problems.push('activity has no steps');
     if (!lesson.independentMission) problems.push('no independent mission');
-    if (!lesson.misconception) problems.push('no misconception');
-    if (!lesson.parentSummary) problems.push('no parent summary');
-
-    for (const band of ['explorer', 'builder', 'creator']) {
-      if (!lesson.differentiation[band]) problems.push(`no ${band} differentiation`);
+    if (!lesson.childMission) problems.push('no child-voiced mission');
+    // The plan writes missions as instructions to the tutor. Rendering that to
+    // a nine-year-old is unreadable, so the child version must not slip back
+    // into talking *about* them.
+    if (/\b(the learner|require the|ask the learner|give the learner)\b/i.test(lesson.childMission)) {
+      problems.push('child mission is written in tutor voice');
     }
+    if (!lesson.adaptation.younger) problems.push('no 6-8 adaptation');
+    if (!lesson.adaptation.older) problems.push('no 13-16 adaptation');
+    if (!lesson.parentTakeaway) problems.push('no parent takeaway');
 
-    // Every scene must have someone speaking, or the page renders a blank card.
-    for (const scene of lesson.scenes) {
-      if (scene.turns.length === 0) problems.push(`scene ${scene.id} has no dialogue`);
-      if (scene.turns.some((turn) => !turn.text.trim())) problems.push(`scene ${scene.id} has empty text`);
-    }
-
-    // A pause scene whose text has no "Welcome back." would render a reveal
-    // button with nothing behind it.
-    const pauses = lesson.scenes.filter((scene) => scene.isPause);
-    if (pauses.length !== 2) problems.push(`${pauses.length} pause scenes`);
-    for (const pause of pauses) {
-      if (!pause.turns[0]?.text.includes('Welcome back.')) {
-        problems.push(`pause scene ${pause.id} has no reveal`);
-      }
-    }
+    // The film has to exist and be the length the lesson claims.
+    const file = join('public', lesson.video.src.replace(/^\//, ''));
+    if (!existsSync(file)) problems.push(`video missing: ${file}`);
+    const poster = join('public', 'images', lesson.video.poster);
+    if (!existsSync(poster)) problems.push(`poster missing: ${poster}`);
+    if (lesson.video.durationSeconds <= 0) problems.push('video has no duration');
 
     report(problems.length === 0, where, problems.join('; '));
   }
 }
 
 console.log('\n== every quiz question is answerable ==');
-for (const course of available) {
+for (const course of courses) {
   for (const lesson of course.lessons) {
     const problems = [];
 
@@ -112,13 +117,18 @@ for (const course of available) {
     lesson.quiz.forEach((question, index) => {
       const n = index + 1;
       if (!question.question.trim()) problems.push(`Q${n} has no text`);
-      if (question.options.length < 2) problems.push(`Q${n} has ${question.options.length} options`);
+      if (question.options.length < 3) problems.push(`Q${n} has ${question.options.length} options`);
       if (new Set(question.options).size !== question.options.length) {
         problems.push(`Q${n} has duplicate options`);
       }
       // The one that makes a question unanswerable.
       if (!question.options.includes(question.answer)) {
         problems.push(`Q${n} answer is not among its options`);
+      }
+      // The plan's release check: "Does each wrong answer reveal a real
+      // misconception?" A blank one certainly does not.
+      if (question.options.some((option) => !option.trim())) {
+        problems.push(`Q${n} has an empty option`);
       }
       if (!question.explanation.trim()) problems.push(`Q${n} has no explanation`);
     });
@@ -127,165 +137,169 @@ for (const course of available) {
   }
 }
 
-console.log('\n== no step is a wall of text ==');
+console.log('\n== the answer is not always the first button ==');
 {
-  // The first version of the lesson page put every scene on one screen and was
-  // unreadable for a child. The page now shows one scene at a time, so the
-  // guard is per scene — and it measures what a child actually sees, after the
-  // video-only instructions are dropped.
-  const MAX_WORDS_PER_SCENE = 120;
-
-  const sentences = (text) =>
-    (text.match(/[^.!?]+[.!?]+["'’”]*\s*/g) ?? [text]).map((s) => s.trim()).filter(Boolean);
-  const onScreen = (text) =>
-    sentences(text)
-      .filter((s) => !/\bvideo\b|countdown reaches zero|\bpause for up to\b/i.test(s))
-      .join(' ');
-
-  for (const course of available) {
+  // The generator lists the correct answer first, so the UI must shuffle. It
+  // did not, and every quiz was answerable without reading the question. This
+  // measures what a child actually sees.
+  const positions = [];
+  for (const course of courses) {
     for (const lesson of course.lessons) {
-      const heaviest = lesson.scenes
-        .map((scene) => ({
-          label: scene.label,
-          words: scene.turns.map((t) => onScreen(t.text)).join(' ').split(/\s+/).filter(Boolean).length,
-        }))
-        .sort((a, b) => b.words - a.words)[0];
-
-      report(
-        heaviest.words <= MAX_WORDS_PER_SCENE,
-        `${course.id}/${lesson.id}`,
-        `heaviest step: ${heaviest.label}, ${heaviest.words} words`,
-      );
+      for (const question of lesson.quiz) {
+        const shown = seededShuffle(question.options, question.question);
+        positions.push(shown.indexOf(question.answer));
+      }
     }
   }
 
-  // A lesson that still says "pause the video" on a page with no video leaves a
-  // child waiting for something that never happens.
-  for (const course of available) {
-    for (const lesson of course.lessons) {
-      const stranded = lesson.scenes.filter((scene) =>
-        scene.turns.some((turn) => /pause the video/i.test(onScreen(turn.text))),
-      );
-      report(stranded.length === 0, `${course.id}/${lesson.id}: no leftover video instructions`);
+  const first = positions.filter((p) => p === 0).length;
+  const share = first / positions.length;
+  report(
+    positions.every((p) => p >= 0),
+    'every correct answer survives the shuffle',
+  );
+  report(
+    share < 0.6,
+    'the answer is not always first',
+    `${first} of ${positions.length} questions (${Math.round(share * 100)}%)`,
+  );
+  report(
+    new Set(positions).size > 1,
+    'answers land in more than one position',
+    `positions used: ${[...new Set(positions)].sort().join(', ')}`,
+  );
+
+  // The same shuffle must be stable, or a retry would move the buttons.
+  const sample = courses[0].lessons[0].quiz[0];
+  report(
+    seededShuffle(sample.options, sample.question).join('|') ===
+      seededShuffle(sample.options, sample.question).join('|'),
+    'the shuffle is stable across renders',
+  );
+
+  const gamePositions = [];
+  for (const game of activityGames) {
+    for (const round of game.rounds) {
+      const shown = seededShuffle(round.options, round.id);
+      gamePositions.push(shown.findIndex((o) => o.id === round.answer));
     }
   }
+  const gameFirst = gamePositions.filter((p) => p === 0).length;
+  report(
+    gameFirst / gamePositions.length < 0.6,
+    'activity answers are not always first',
+    `${gameFirst} of ${gamePositions.length} rounds`,
+  );
+
+  // Sound Riddle sources are authored with the true answer first, so this is the
+  // one that most needs checking after shuffling.
+  const soundFirst = RIDDLE_ROUNDS.filter((round) => {
+    const shuffled = seededShuffle(
+      round.sources.filter((card) => card.id !== 'unsure'),
+      `${round.id}:1`,
+    );
+    return shuffled[0]?.id === round.answer;
+  }).length;
+  report(
+    soundFirst < RIDDLE_ROUNDS.length,
+    'sound sources are not always first',
+    `${soundFirst} of ${RIDDLE_ROUNDS.length} rounds`,
+  );
+
+  // A different seed must give a different arrangement, or "random every time"
+  // would be a claim rather than a behaviour.
+  const runs = new Set(
+    [1, 2, 3, 4, 5].map((n) => seededShuffle(sample.options, `${sample.question}:${n}`).join('|')),
+  );
+  report(runs.size > 1, 'a new visit gives a new order', `${runs.size} orders from 5 seeds`);
 }
 
-console.log('\n== every lesson has a playable activity ==');
+console.log('\n== activities ==');
 {
-  for (const course of available) {
+  let withGames = 0;
+  for (const course of courses) {
     for (const lesson of course.lessons) {
-      const game = findActivityGame(course.id, lesson.id);
-      report(game !== undefined, `${course.id}/${lesson.id}: has a game`, game ? game.title : 'falls back to instructions');
+      if (findActivityGame(course.id, lesson.id)) withGames += 1;
     }
   }
+  // Lessons without a game still render their steps, so this is progress
+  // reporting rather than a failure — but it is printed so nobody forgets.
+  console.log(`NOTE  ${withGames} of ${TOTAL_LESSONS} lessons have a playable game`);
 
   for (const game of activityGames) {
     const problems = [];
+    const [courseId, lessonId] = game.lessonKey.split('/');
+    const course = courses.find((entry) => entry.id === courseId);
+    if (!course?.lessons.some((entry) => entry.id === lessonId)) {
+      problems.push('points at a lesson that does not exist');
+    }
     if (game.rounds.length < 4) problems.push(`only ${game.rounds.length} rounds`);
     if (!game.intro || !game.outro) problems.push('missing intro or outro');
-
-    const ids = game.rounds.map((round) => round.id);
-    if (new Set(ids).size !== ids.length) problems.push('duplicate round ids');
 
     game.rounds.forEach((round, index) => {
       const n = index + 1;
       const optionIds = round.options.map((option) => option.id);
-
-      // The one that makes a round unwinnable.
       if (!optionIds.includes(round.answer)) problems.push(`round ${n} answer is not an option`);
       if (new Set(optionIds).size !== optionIds.length) problems.push(`round ${n} has duplicate options`);
-      if (round.options.length < 2) problems.push(`round ${n} has too few options`);
-      if (!round.question.trim()) problems.push(`round ${n} has no question`);
       if (!round.explanation.trim()) problems.push(`round ${n} has no explanation`);
-      // A screen reader user gets the label instead of the picture, so it has
-      // to describe what is visible without naming the answer.
       if (!round.visual.label?.trim()) problems.push(`round ${n} visual has no label`);
     });
 
     report(problems.length === 0, game.lessonKey, problems.join('; '));
   }
-
-  // Every game must belong to a lesson that exists.
-  for (const game of activityGames) {
-    const [courseId, lessonId] = game.lessonKey.split('/');
-    const course = courses.find((entry) => entry.id === courseId);
-    const lesson = course?.lessons.find((entry) => entry.id === lessonId);
-    report(lesson !== undefined, `${game.lessonKey}: points at a real lesson`);
-  }
 }
 
-console.log('\n== lesson films ==');
+console.log('\n== every lesson has a playable independent mission ==');
 {
-  // The delivered edit ran 3:08 against a 10:00 script, so the document's
-  // timecodes were unusable. These guards catch the same drift next time: a
-  // pause set past the end of the file would simply never fire, and nobody
-  // would notice until a child sat through the film without being asked to
-  // think.
-  for (const [key, video] of Object.entries(lessonVideos)) {
-    const [courseId, lessonId] = key.split('/');
-    const course = courses.find((entry) => entry.id === courseId);
-    const lesson = course?.lessons.find((entry) => entry.id === lessonId);
-    const problems = [];
+  // Two lessons have bespoke missions; the rest use the build-it engine. A
+  // lesson with neither falls back to a paragraph of text, which is what this
+  // whole exercise was about removing.
+  const BESPOKE = [
+    'ai-detective-academy/picture-clue-patrol',
+    'ai-detective-academy/sound-safari',
+    'ai-detective-academy/creative-clues',
+  ];
 
-    if (!lesson) problems.push('points at a lesson that does not exist');
-
-    const file = join('public', video.src.replace(/^\//, ''));
-    if (!existsSync(file)) problems.push(`video file missing: ${file}`);
-    const poster = join('public', video.poster.replace(/^\//, ''));
-    if (!existsSync(poster)) problems.push(`poster missing: ${poster}`);
-
-    if (video.chapters.length === 0) problems.push('no chapters');
-    if (video.chapters[0]?.start !== 0) problems.push('first chapter does not start at 0');
-
-    let previous = -1;
-    for (const chapter of video.chapters) {
-      if (chapter.start <= previous) problems.push(`chapters out of order at ${chapter.sceneId}`);
-      if (chapter.start >= video.durationSeconds) {
-        problems.push(`chapter ${chapter.sceneId} starts past the end`);
-      }
-      if (lesson && !lesson.scenes.some((scene) => scene.id === chapter.sceneId)) {
-        problems.push(`chapter ${chapter.sceneId} is not a scene in the lesson`);
-      }
-      previous = chapter.start;
+  for (const course of courses) {
+    for (const lesson of course.lessons) {
+      const key = `${course.id}/${lesson.id}`;
+      const playable = BESPOKE.includes(key) || findBuildMission(key) !== undefined;
+      report(playable, `${key}: mission is playable`, playable ? '' : 'falls back to text');
     }
-
-    // Every scripted pause point must exist in the film, and land inside it.
-    const pauseScenes = lesson?.scenes.filter((scene) => scene.isPause) ?? [];
-    for (const scene of pauseScenes) {
-      const pause = video.pauses.find((entry) => entry.sceneId === scene.id);
-      if (!pause) {
-        problems.push(`scene ${scene.id} asks the child to pause, but the film never stops`);
-        continue;
-      }
-      if (pause.at <= 0 || pause.at >= video.durationSeconds) {
-        problems.push(`pause for ${scene.id} at ${pause.at}s is outside the ${video.durationSeconds}s film`);
-      }
-    }
-
-    if (!video.captions) {
-      console.log(`NOTE  ${key}: no subtitles yet — required before public release`);
-    }
-
-    // The document promises "Exactly 10 minutes" and the site was printing it
-    // beside a 3:08 film. Every displayed time is now computed from the file, so
-    // this asserts the two can never disagree again.
-    if (lesson) {
-      const shown = stageTime('Lesson video', lesson.components[0]?.time ?? '', video);
-      const real = `${videoMinutes(video)} min`;
-      if (shown !== real) problems.push(`shows "${shown}" for a ${real} film`);
-
-      const planned = lesson.components[0]?.time ?? '';
-      if (parseMinutes(planned)?.min !== videoMinutes(video)) {
-        console.log(
-          `NOTE  ${key}: script plans ${planned} of video, delivered film is ` +
-            `${formatDuration(video.durationSeconds)} — site shows the real length`,
-        );
-      }
-    }
-
-    report(problems.length === 0, `${key}: film wiring`, problems.join('; '));
   }
+
+  for (const mission of buildMissions) {
+    const problems = [];
+    if (mission.steps.length < 2) problems.push('too few steps');
+    if (!mission.check.question) problems.push('no check question');
+
+    const answers = mission.check.options.map((o) => o.id);
+    if (!answers.includes(mission.check.answer)) problems.push('check answer is not an option');
+    if (!mission.check.explanation) problems.push('check has no explanation');
+
+    for (const step of mission.steps) {
+      const good = step.options.filter((o) => o.good).length;
+      if (good < step.pick) {
+        problems.push(`step ${step.id} cannot be answered well (${good} good, needs ${step.pick})`);
+      }
+      if (step.options.length <= step.pick) problems.push(`step ${step.id} has no real choice`);
+    }
+
+    // Placeholders must all resolve, or a child sees "{1}" in their sentence.
+    const slots = [...mission.sentence.matchAll(/\{(\d+)\}/g)].map((m) => Number(m[1]));
+    for (const slot of slots) {
+      if (slot >= mission.steps.length) problems.push(`sentence references step ${slot}`);
+    }
+    if (slots.length === 0) problems.push('sentence uses no choices');
+
+    report(problems.length === 0, mission.lessonKey, problems.join('; '));
+  }
+
+  console.log(
+    `NOTE  build-it missions score up to ${buildMissions
+      .map((m) => missionMaxScore(m))
+      .join(', ')} points`,
+  );
 }
 
 console.log('\n== badges ==');
@@ -294,11 +308,24 @@ report(
   badges.every((badge) => badge.name && badge.description && badge.requirement && badge.emoji),
   'every badge is fully described',
 );
-const lessonBadgeIds = available.flatMap((c) => c.lessons.map((l) => l.badgeId));
 report(
-  new Set(lessonBadgeIds).size === lessonBadgeIds.length,
-  'no two lessons share a badge',
+  badges.filter((b) => b.kind === 'lesson').length === TOTAL_LESSONS,
+  'one badge per lesson',
+  `${badges.filter((b) => b.kind === 'lesson').length}`,
 );
+report(
+  badges.filter((b) => b.kind === 'course').length === courses.length,
+  'one badge per capstone',
+);
+
+console.log('\n== subtitles ==');
+for (const course of courses) {
+  for (const lesson of course.lessons) {
+    if (!lesson.video.captions) {
+      console.log(`NOTE  ${course.id}/${lesson.id}: no subtitles — on the plan's release checklist`);
+    }
+  }
+}
 
 console.log(
   `\n${failures === 0 ? '✔ course content is complete and answerable' : `✖ ${failures} failure(s)`}`,

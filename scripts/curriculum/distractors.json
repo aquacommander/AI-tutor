@@ -1,0 +1,112 @@
+{
+  "_comment": [
+    "Wrong answers for the 70 quiz questions in the revised course plan.",
+    "",
+    "The plan supplies each question, its correct answer and why it matters, but",
+    "not the options a child chooses between. Its own release checklist asks:",
+    "'Does each wrong answer reveal a real misconception?' — so these are written",
+    "against the misconceptions each lesson exists to correct, not as filler.",
+    "",
+    "AUTHORED, NOT PARSED. A qualified tutor must review this file before",
+    "children use it; it is deliberately kept separate from the parsed content so",
+    "the two are never confused."
+  ],
+  "ai-detective-academy/picture-clue-patrol": [
+    ["It makes the picture bigger and clearer.", "It understands the picture the way you do."],
+    ["The classifier thinks costumes are funny.", "A costume turns the animal into something else."],
+    ["When you want to finish quickly.", "Never — you should always pick an answer."],
+    ["Yes, if it is a really good clue.", "Yes, as long as the picture is clear."],
+    ["Decide the AI is broken and stop using it.", "Ignore it — one mistake does not matter."]
+  ],
+  "ai-detective-academy/sound-safari": [
+    ["How loud or quiet a sound is.", "How long a sound lasts."],
+    ["Make the computer listen harder.", "Nothing — computers filter it out perfectly."],
+    ["It should guess the most likely thing.", "It should act anyway — it is usually right."],
+    ["The meaning of the words.", "How much the listener enjoys it."],
+    ["Yes — a waveform is how hearing works.", "Yes, once it has heard enough sounds."]
+  ],
+  "ai-detective-academy/creative-clues": [
+    ["Yes — AI work always looks the same.", "Yes, if it looks too perfect."],
+    ["“It looks strange” — your eyes do not lie.", "They are equally strong."],
+    ["Say you are certain, so people believe you.", "Say nothing at all."],
+    ["It slows the computer down.", "It does not — you can say sorry afterwards."],
+    ["No — changing your mind means you were careless.", "Only if somebody tells you to."]
+  ],
+  "ai-detective-academy/glitch-hunt": [
+    ["Change as many things as possible straight away.", "Hide it so nobody notices."],
+    ["A fact you already know is true.", "A guess you never check."],
+    ["Because computers can only handle one change.", "To make the work take longer."],
+    ["Yes — the same examples make results easy to compare.", "Yes, as long as there are lots of them."],
+    ["Proof that AI never works.", "A reason to start again from nothing."]
+  ],
+  "ai-detective-academy/ai-detective": [
+    ["To check how good the finished rule is.", "To store the answers so they can be looked up."],
+    ["To teach the rule in the first place.", "To make the training set bigger."],
+    ["To keep them clean and undamaged.", "Because there are not enough to share."],
+    ["To let the system avoid hard work.", "Because every question needs three answers."],
+    ["The screen the results appear on.", "Nothing — repeated errors are normal."]
+  ],
+  "train-your-robot-brain/feature-find": [
+    ["A special ability the computer has.", "The name of the finished category."],
+    ["Yes — colour is always the clearest clue.", "No — colour is never useful."],
+    ["It makes the file bigger.", "It is fine to collect, as long as you do not look at it."],
+    ["It sounds scientific.", "Everybody agrees it is important."],
+    ["Yes — more information is always better.", "Yes, as long as the computer is fast enough."]
+  ],
+  "train-your-robot-brain/data-kitchen": [
+    ["An example with a missing label.", "A copy you made on purpose as a backup."],
+    ["They make the table look untidy.", "They are not a problem — the computer guesses."],
+    ["When the data is stored in the wrong order.", "When two examples contradict each other."],
+    ["Yes — more data always wins.", "No — smaller datasets are always better."],
+    ["Only the final number of rows.", "Nothing — the data speaks for itself."]
+  ],
+  "train-your-robot-brain/mood-mixer": [
+    ["Exactly how the writer feels inside.", "Whether the message is spelled correctly."],
+    ["Using a capital letter.", "Nothing — “Great!” is always positive."],
+    ["Yes, if the message is long enough.", "Yes — that is what sentiment analysis means."],
+    ["Assume the worst and reply angrily.", "Pick the most likely feeling and act on it."],
+    ["To make the quiz easier.", "Because the computer gets tired."]
+  ],
+  "train-your-robot-brain/robot-brain": [
+    ["The system is tested on examples it has never seen.", "A person types in every rule by hand."],
+    ["Making the model run faster.", "Adding extra categories at the end."],
+    ["To keep the examples secret from other people.", "To save space on the computer."],
+    ["Remember every training example perfectly.", "Work on one very specific task only."],
+    ["Yes — errors make the work look bad.", "Only if the errors are small."]
+  ],
+  "ai-game-creator-lab/game-hero": [
+    ["The picture the game draws on screen.", "The hero’s personality."],
+    ["How fast the game is running.", "The button the player pressed a moment ago."],
+    ["No — one button always does one thing.", "Only if the game is broken."],
+    ["Yes — reacting means it is thinking.", "Yes, once the game is complicated enough."],
+    ["To prove your rules are already perfect.", "Because testing alone is against the rules."]
+  ],
+  "ai-game-creator-lab/choice-engine": [
+    ["The action to carry out.", "The name of the character."],
+    ["Another condition to check.", "The reason the rule exists."],
+    ["To make the list look tidy.", "Because the computer reads from the bottom upwards."],
+    ["A rule with a spelling mistake.", "A rule nobody has tested yet."],
+    ["To make the game last longer.", "So the game can hide its mistakes."]
+  ],
+  "ai-game-creator-lab/maze-mission": [
+    ["The shortest straight line to the goal.", "A wall that blocks the way."],
+    ["To make the maze look colourful.", "To stop the player ever going back."],
+    ["Yes — shortest always means best.", "No — the longest route is always safest."],
+    ["Keep following the old plan anyway.", "Stop and give up on the goal."],
+    ["How much money the game costs.", "The number of squares on the whole map."]
+  ],
+  "smart-and-safe-ai-heroes/privacy-mission": [
+    ["Making the writing on a form smaller.", "Collecting as much as possible, in case it is useful later."],
+    ["Exact birth date — it is more accurate.", "They carry exactly the same risk."],
+    ["No — that would make the form too long.", "Only if the user asks first."],
+    ["Their best friend.", "Nobody — it is a private decision."],
+    ["Yes — you might need it one day.", "Yes, as long as it is kept safe."]
+  ],
+  "smart-and-safe-ai-heroes/truth-tracker": [
+    ["How many people have shared it.", "Whether it matches what you already believe."],
+    ["Older posts are always more trustworthy.", "It does not matter, if the facts are right."],
+    ["Yes — that many people cannot all be wrong.", "Yes, if the account has a verified tick."],
+    ["No — a real photo always tells the truth.", "Only if the photo has been edited."],
+    ["Share it with a warning that it might be false.", "Share it — somebody else will check."]
+  ]
+}

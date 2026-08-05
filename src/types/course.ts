@@ -1,5 +1,5 @@
 import type { ImageKey } from '@/lib/images';
-import type { AgeGroupId, ThemeName } from './learner';
+import type { ThemeName } from './learner';
 
 export type LessonDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
@@ -16,56 +16,12 @@ export interface FeaturedLesson {
   accent: CourseAccent;
 }
 
-/** Who is speaking in a scene. Glitch is the character who gets things wrong. */
-export type Speaker = 'tutor' | 'glitch';
-
-export interface SpeakerTurn {
-  speaker: Speaker;
-  text: string;
-}
-
-/**
- * One scene of a lesson.
- *
- * These come from the tutor video scripts, and the platform renders them as the
- * readable lesson body. When the films are produced, the player sits above this
- * and the same text becomes the transcript — which the curriculum's own
- * accessibility standard asks for anyway ("non-audio alternatives").
- *
- * `visual` is production direction for the film crew, never shown to a child.
- */
-export interface LessonScene {
-  id: string;
-  label: string;
-  /** Timecode in the video script, e.g. "0:00–0:50". */
-  time: string;
-  turns: SpeakerTurn[];
-  visual: string;
-  /** Scenes that ask the child to stop and answer become prompt cards. */
-  isPause: boolean;
-}
-
-/** A point a child can jump to. `sceneId` ties it back to the script. */
-export interface VideoChapter {
-  sceneId: string;
-  label: string;
-  start: number;
-}
-
-/** Where the player stops itself and waits for the child to think. */
-export interface VideoPause {
-  sceneId: string;
-  at: number;
-}
-
 export interface LessonVideo {
   src: string;
-  poster: string;
+  poster: ImageKey;
   durationSeconds: number;
-  /** WebVTT subtitles. Required before public release. */
+  /** WebVTT subtitles. Required by the plan's release checklist. */
   captions?: string;
-  chapters: VideoChapter[];
-  pauses: VideoPause[];
 }
 
 export interface QuizQuestion {
@@ -73,27 +29,36 @@ export interface QuizQuestion {
   options: string[];
   /** Matches one entry of `options` exactly; enforced by a fixture. */
   answer: string;
-  /** Shown after answering, right or wrong. A score alone teaches nothing. */
+  /** The plan's "why it matters" — shown after every answer, right or wrong. */
   explanation: string;
+}
+
+/**
+ * The clean text the platform shows straight after the film.
+ *
+ * The revised plan is blunt about why this exists: "Generated text inside
+ * several scenes is misspelled, fragmented or difficult to read. Important
+ * definitions must therefore be shown again as clean platform text after the
+ * video." So the definition a child reads is never the one burned into the
+ * animation.
+ */
+export interface ConceptCard {
+  /** One sentence. Taken from the lesson's own core answer. */
+  bigIdea: string;
+  vocabulary: string[];
+  /** "By the end you can…" */
+  objectives: string[];
 }
 
 export interface LessonActivity {
   title: string;
-  purpose: string;
-  time: string;
   steps: string[];
 }
 
-/**
- * One stage of the lesson, with how long it should take.
- *
- * These timings differ per lesson — the guided activity runs 10-12 minutes in
- * lesson 1 and 15-18 in lesson 5 — so they cannot be derived from the structure
- * and have to be carried from the course material.
- */
-export interface LessonComponent {
+/** How the plan splits a lesson's 30-38 minutes. */
+export interface LessonStage {
   name: string;
-  time: string;
+  minutes: string;
   purpose: string;
 }
 
@@ -102,44 +67,61 @@ export interface Lesson {
   /** 1-indexed position within its course. */
   number: number;
   title: string;
-  mission: string;
-  concept: string;
-  badgeId: string;
-  learnerTime: string;
-  xpReward: number;
-  objectives: string[];
-  vocabulary: string[];
-  materials: string[];
-  /** The lesson's stages and timings, shown to the child as a plan up front. */
-  components: LessonComponent[];
-  scenes: LessonScene[];
+  /** Curiosity hook, shown *before* the film. */
+  hook: string;
+  /** What to look out for while watching. */
+  watchFocus: string;
+  video: LessonVideo;
+  concept: ConceptCard;
   activity: LessonActivity;
+  /**
+   * The plan phrases this as an instruction to the tutor ("Give the learner a
+   * new animal image"). That is what the grown-ups panel shows.
+   */
   independentMission: string;
+  /** The same task, addressed to the child. This is what the lesson displays. */
+  childMission: string;
   quiz: QuizQuestion[];
-  /** The same lesson, pitched at each age band. */
-  differentiation: Record<AgeGroupId, string>;
-  misconception: string;
-  parentSummary: string;
-  /** Assets the video production needs. Never shown to a child. */
-  productionAssets: string[];
+  /** Adjustments for the bands either side of the 9-12 core audience. */
+  adaptation: { younger: string; older: string };
+  parentTakeaway: string;
+  badgeId: string;
+  xpReward: number;
+  /** Total learner time, e.g. "30-38 minutes". */
+  learnerTime: string;
+}
+
+/**
+ * The end-of-course project.
+ *
+ * The plan uses these to carry the learning that the six unmade videos would
+ * have held, and makes the course badge conditional on finishing one — "Award
+ * the course badge only after the capstone, not after passive video viewing."
+ */
+export interface Capstone {
+  id: string;
+  title: string;
+  time: string;
+  badgeId: string;
+  summary: string;
+  evidence: string;
+  tasks: string[];
+  successStandard: string;
+  xpReward: number;
 }
 
 export interface Course {
   id: string;
+  number: number;
   title: string;
   tagline: string;
   outcomes: string[];
   lessons: Lesson[];
-  /** Awarded once every lesson in the course is complete. */
-  badgeId: string;
-  /** Bonus on top of the lesson XP, for finishing the whole course. */
-  completionXp: number;
+  capstone: Capstone;
   difficulty: LessonDifficulty;
   topics: string[];
   image: ImageKey;
   accent: CourseAccent;
-  /** `coming-soon` courses appear in the library but cannot be opened. */
-  status: 'available' | 'coming-soon';
 }
 
 /** Card-sized view of a course, derived rather than maintained separately. */
@@ -153,8 +135,23 @@ export interface CourseSummary {
   topics: string[];
   image: ImageKey;
   accent: CourseAccent;
-  status: Course['status'];
 }
 
-/** Quiz pass mark, from the curriculum's assessment standard: 4 of 5. */
+/**
+ * Progress rules, from the plan's "recommended learner progress rules".
+ * Kept here so the quiz, the lesson flow and the fixtures read one source.
+ */
+export const QUIZ_PASS_PERCENT = 80;
+
+/** 80% of five questions. */
 export const QUIZ_PASS_MARK = 4;
+
+/** The plan's standard lesson shape, identical across all 14 lessons. */
+export const LESSON_STAGES: LessonStage[] = [
+  { name: 'Mission hook', minutes: '2–3 min', purpose: 'A question that makes you curious.' },
+  { name: 'Watch the mission', minutes: '1–3 min', purpose: 'The film introduces the big idea.' },
+  { name: 'Concept card', minutes: '3–4 min', purpose: 'The idea again, in clear words.' },
+  { name: 'Guided activity', minutes: '12–15 min', purpose: 'Your turn to play with it.' },
+  { name: 'Your own mission', minutes: '5–8 min', purpose: 'Make something without help.' },
+  { name: 'Quiz', minutes: '5–7 min', purpose: 'Check what you discovered.' },
+];

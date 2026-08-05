@@ -39,6 +39,11 @@ function parseLearnerState(raw: string | null): StoredLearnerState | null {
         : [],
       earnedBadges: Array.isArray(candidate.earnedBadges) ? candidate.earnedBadges : [],
       recentActivity: Array.isArray(candidate.recentActivity) ? candidate.recentActivity : [],
+      // Added after v1 shipped, so an older record simply has none yet.
+      activityResults:
+        typeof candidate.activityResults === 'object' && candidate.activityResults !== null
+          ? candidate.activityResults
+          : {},
       lastActivityAt: candidate.lastActivityAt ?? new Date().toISOString(),
     };
   } catch {
@@ -71,6 +76,7 @@ export function createInitialLearnerState(ageGroup: AgeGroupId): StoredLearnerSt
     completedChallenges: [],
     earnedBadges: [],
     recentActivity: [],
+    activityResults: {},
     lastActivityAt: new Date().toISOString(),
   };
 }

@@ -5,6 +5,8 @@ import { Check, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { useShuffleNonce } from '@/hooks/use-shuffle';
+import { seededShuffle } from '@/lib/shuffle';
 import { cn } from '@/lib/utils';
 import { QUIZ_PASS_MARK, type QuizQuestion } from '@/types/course';
 
@@ -29,8 +31,13 @@ export function LessonQuiz({ questions, onPass, alreadyPassed }: LessonQuizProps
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
   const [answers, setAnswers] = useState<boolean[]>([]);
+  const { nonce, reshuffle } = useShuffleNonce();
 
   const question = questions[index];
+  // The data lists the correct answer first, so without this every answer would
+  // be the top button. The nonce changes on every visit, so the order is new
+  // each time — but stays put while a question is on screen.
+  const options = question ? seededShuffle(question.options, `${question.question}:${nonce}`) : [];
   const isLast = index === questions.length - 1;
   const finished = answers.length === questions.length;
   const score = answers.filter(Boolean).length;
@@ -59,6 +66,7 @@ export function LessonQuiz({ questions, onPass, alreadyPassed }: LessonQuizProps
     setIndex(0);
     setChosen(null);
     setAnswers([]);
+    reshuffle();
   };
 
   if (finished && chosen === null) {
@@ -107,7 +115,7 @@ export function LessonQuiz({ questions, onPass, alreadyPassed }: LessonQuizProps
       <p className="mt-5 font-heading text-lg font-bold">{question.question}</p>
 
       <ul className="mt-4 space-y-2.5">
-        {question.options.map((option) => {
+        {options.map((option) => {
           const picked = chosen === option;
           const correct = option === question.answer;
           // Only reveal the right answer once a choice has been made.

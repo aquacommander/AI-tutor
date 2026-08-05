@@ -38,6 +38,5 @@ next-env.d.ts
 
 # Lesson films — hosted on a CDN, not in the repo.
 # Lesson 1 is committed deliberately so the demo works from a fresh clone.
+# 138 MB of film. Move to a CDN before launch; see README.
 /public/videos/**
-!/public/videos/ai-detective-academy/
-!/public/videos/ai-detective-academy/picture-clue-patrol.mp4

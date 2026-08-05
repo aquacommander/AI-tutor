@@ -7,7 +7,7 @@ interface PageProps {
   params: { courseId: string; lessonId: string };
 }
 
-/** Every lesson of every transcribed course is pre-rendered. */
+/** Every lesson of every course is pre-rendered. */
 export function generateStaticParams() {
   return courses.flatMap((course) =>
     course.lessons.map((lesson) => ({ courseId: course.id, lessonId: lesson.id })),
@@ -20,7 +20,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
 
   return {
     title: `${found.lesson.title} · ${found.course.title}`,
-    description: found.lesson.mission,
+    description: found.lesson.concept.bigIdea,
   };
 }
 

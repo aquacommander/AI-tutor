@@ -1,3 +1,5 @@
+import { courses } from './courses.ts';
+
 export type BadgeKind = 'platform' | 'lesson' | 'course';
 
 export interface BadgeDefinition {
@@ -31,7 +33,7 @@ const platformBadges: BadgeDefinition[] = [
   {
     id: 'code-starter',
     name: 'Code Starter',
-    description: 'You ran your first Python program.',
+    description: 'You wrote your first Python program.',
     requirement: 'Complete 1 Code Lab challenge',
     emoji: '⌨️',
     kind: 'platform',
@@ -47,17 +49,9 @@ const platformBadges: BadgeDefinition[] = [
   {
     id: 'quiz-champ',
     name: 'Quiz Champ',
-    description: 'You aced a lesson quiz.',
+    description: 'You answered every question correctly.',
     requirement: 'Score full marks on any quiz',
     emoji: '🏆',
-    kind: 'platform',
-  },
-  {
-    id: 'streak-keeper',
-    name: 'Streak Keeper',
-    description: 'You learned five days in a row.',
-    requirement: 'Reach a 5-day streak',
-    emoji: '🔥',
     kind: 'platform',
   },
   {
@@ -68,98 +62,97 @@ const platformBadges: BadgeDefinition[] = [
     emoji: '🌟',
     kind: 'platform',
   },
-];
-
-/**
- * Curriculum badges, one per lesson, named in the course material.
- *
- * Kept beside the platform badges so the dashboard has a single list to render,
- * but declared separately because these grow with every course transcribed —
- * Course 1 contributes five, and there will be twenty when all four are in.
- */
-const lessonBadges: BadgeDefinition[] = [
   {
-    id: 'pixel-detective',
-    name: 'Pixel Detective',
-    description: 'You sorted mystery pictures using visible clues.',
-    requirement: 'Finish Picture Clue Patrol',
-    emoji: '🔍',
-    kind: 'lesson',
+    id: 'two-clue-detective-star',
+    name: 'Two-Clue Detective Star',
+    description: 'You named animals and backed every answer with two clues.',
+    requirement: 'Score 210 in the Two-Clue Animal Challenge',
+    emoji: '⭐',
+    kind: 'platform',
   },
   {
-    id: 'sound-scout',
-    name: 'Sound Scout',
-    description: 'You matched mystery sounds to their sources.',
-    requirement: 'Finish Sound Safari',
-    emoji: '👂',
-    kind: 'lesson',
+    id: 'sound-detective',
+    name: 'Sound Detective',
+    description: 'You solved sound mysteries using pitch, rhythm and volume.',
+    requirement: 'Score 420 in the Sound Riddle Challenge',
+    emoji: '🎧',
+    kind: 'platform',
   },
   {
-    id: 'source-sleuth',
-    name: 'Source Sleuth',
-    description: 'You judged whether a person or a machine made something.',
-    requirement: 'Finish Human or Machine?',
+    id: 'evidence-investigator',
+    name: 'Evidence Investigator',
+    description: 'You judged what made things — without ever claiming more than the evidence proved.',
+    requirement: 'Score 420 in the AI Evidence Investigator',
     emoji: '🕵️',
-    kind: 'lesson',
+    kind: 'platform',
   },
   {
-    id: 'glitch-buster',
-    name: 'Glitch Buster',
-    description: 'You found the cause of three AI failures.',
-    requirement: 'Finish Glitch Hunt',
-    emoji: '🐞',
-    kind: 'lesson',
-  },
-  {
-    id: 'chief-ai-detective',
-    name: 'Chief AI Detective',
-    description: 'You trained and tested your own picture detective.',
-    requirement: 'Finish Build the Picture Detective',
-    emoji: '🎖️',
-    kind: 'lesson',
+    id: 'graduate',
+    name: 'AI for Kids Graduate',
+    description: 'You finished every course and every capstone.',
+    requirement: 'Complete all four capstone projects',
+    emoji: '🎓',
+    kind: 'platform',
   },
 ];
 
 /**
- * One per course. The course material specifies "one course badge after all
- * missions are completed" without naming them, so each takes its course's name.
+ * One badge per lesson and one per capstone, generated from the courses so a new
+ * lesson can never arrive without a badge to award.
+ *
+ * The capstone badge names come from the course plan; the lesson badges take the
+ * lesson's own title, which keeps them meaningful without inventing new names
+ * the tutor has not seen.
  */
-const courseBadges: BadgeDefinition[] = [
-  {
-    id: 'ai-detective-academy',
-    name: 'AI Detective Academy',
-    description: 'You completed every mission in the Detective Academy.',
-    requirement: 'Finish all 5 lessons in AI Detective Academy',
-    emoji: '🥇',
-    kind: 'course',
-  },
-  {
-    id: 'train-your-robot-brain',
-    name: 'Robot Brain Trainer',
-    description: 'You completed every mission in Train Your Robot Brain.',
-    requirement: 'Finish all 5 lessons in Train Your Robot Brain',
-    emoji: '🤖',
-    kind: 'course',
-  },
-  {
-    id: 'ai-game-creator-lab',
-    name: 'Game Creator',
-    description: 'You completed every mission in the Game Creator Lab.',
-    requirement: 'Finish all 5 lessons in AI Game Creator Lab',
-    emoji: '🎮',
-    kind: 'course',
-  },
-  {
-    id: 'superhero-ai-missions',
-    name: 'Responsible AI Hero',
-    description: 'You completed every Superhero AI mission.',
-    requirement: 'Finish all 5 lessons in Superhero AI Missions',
-    emoji: '🦸',
-    kind: 'course',
-  },
-];
+const LESSON_EMOJI: Record<string, string> = {
+  'picture-clue-patrol': '🔍',
+  'sound-safari': '👂',
+  'creative-clues': '🕵️',
+  'glitch-hunt': '🐞',
+  'ai-detective': '🎖️',
+  'feature-find': '🧭',
+  'data-kitchen': '🥕',
+  'mood-mixer': '💬',
+  'robot-brain': '🤖',
+  'game-hero': '🎮',
+  'choice-engine': '🔀',
+  'maze-mission': '🗺️',
+  'privacy-mission': '🛡️',
+  'truth-tracker': '📰',
+};
 
-export const badges: BadgeDefinition[] = [...platformBadges, ...lessonBadges, ...courseBadges];
+const CAPSTONE_EMOJI: Record<string, string> = {
+  'chief-ai-detective': '🥇',
+  'robot-brain-champion': '🏅',
+  'junior-game-architect': '🎯',
+  'smart-and-safe-ai-hero': '🦸',
+};
+
+const lessonBadges: BadgeDefinition[] = courses.flatMap((course) =>
+  course.lessons.map((lesson) => ({
+    id: lesson.badgeId,
+    name: lesson.title.split(':')[0] ?? lesson.title,
+    description: `You completed ${lesson.title}.`,
+    requirement: `Pass the quiz for lesson ${lesson.number} of ${course.title}`,
+    emoji: LESSON_EMOJI[lesson.id] ?? '⭐',
+    kind: 'lesson' as const,
+  })),
+);
+
+const capstoneBadges: BadgeDefinition[] = courses.map((course) => ({
+  id: course.capstone.badgeId,
+  // Turns "chief-ai-detective" back into the plan's "Chief AI Detective".
+  name: course.capstone.badgeId
+    .split('-')
+    .map((word) => (word === 'ai' ? 'AI' : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join(' '),
+  description: `You finished the ${course.capstone.title}.`,
+  requirement: `Complete the ${course.capstone.title} capstone`,
+  emoji: CAPSTONE_EMOJI[course.capstone.badgeId] ?? '🏅',
+  kind: 'course' as const,
+}));
+
+export const badges: BadgeDefinition[] = [...platformBadges, ...lessonBadges, ...capstoneBadges];
 
 export function findBadge(badgeId: string): BadgeDefinition | undefined {
   return badges.find((badge) => badge.id === badgeId);

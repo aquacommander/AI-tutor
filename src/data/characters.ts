@@ -1,5 +1,7 @@
 import type { ImageKey } from '@/lib/images';
-import type { Speaker } from '@/types/course';
+
+/** Who is speaking. Glitch is the character who gets things wrong. */
+export type Speaker = 'tutor' | 'glitch';
 
 /**
  * The cast, as named in the films.

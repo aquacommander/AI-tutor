@@ -9,9 +9,14 @@ import {
   subscribeToLearner,
   writeLearnerState,
 } from '@/lib/storage';
-import { findCourse } from '@/data/courses';
+import { courses, findCourse } from '@/data/courses';
 import { levelFromXp } from '@/lib/constants';
-import type { ActivityEntry, AgeGroupId, StoredLearnerState } from '@/types/learner';
+import type {
+  ActivityEntry,
+  ActivityResult,
+  AgeGroupId,
+  StoredLearnerState,
+} from '@/types/learner';
 
 const MAX_ACTIVITY_ENTRIES = 4;
 
@@ -45,6 +50,14 @@ export interface UseLearnerProgress {
    * if it was the last one. Returns null if the lesson was already complete.
    */
   completeLesson: (courseId: string, lessonId: string) => LessonReward | null;
+  /**
+   * Records a capstone. The plan is explicit that the course badge is earned
+   * here, not by watching videos: "Award the course badge only after the
+   * capstone, not after passive video viewing."
+   */
+  completeCapstone: (courseId: string) => LessonReward | null;
+  /** Stores a guided-activity record: answers, clues, attempts and score. */
+  recordActivity: (result: ActivityResult) => void;
   /** Idempotent. Safe to call on every visit to a page that earns a badge. */
   earnBadge: (badgeId: string) => void;
   reset: () => void;
@@ -63,6 +76,28 @@ interface Reward {
  * subscribers twice and let the UI render a half-applied reward — a lesson
  * marked complete but momentarily worth no XP.
  */
+/** Calendar days between two ISO timestamps, ignoring the time of day. */
+function daysBetween(from: string, to: Date): number {
+  const a = new Date(from);
+  const start = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate());
+  const end = Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate());
+  return Math.round((end - start) / 86_400_000);
+}
+
+/**
+ * The streak, counted in calendar days rather than hours.
+ *
+ * Learning at 9pm and again at 9am the next morning is two days in a row, which
+ * is how a child would count it. Anything longer than a day's gap starts again
+ * at one — a streak that survives a fortnight away is not a streak.
+ */
+function nextStreak(current: StoredLearnerState, now: Date): number {
+  const gap = daysBetween(current.lastActivityAt, now);
+  if (gap === 0) return Math.max(1, current.progress.streakDays);
+  if (gap === 1) return current.progress.streakDays + 1;
+  return 1;
+}
+
 function applyReward(reward: Reward): StoredLearnerState | null {
   const current = getLearnerSnapshot();
   if (!current) return null;
@@ -83,17 +118,26 @@ function applyReward(reward: Reward): StoredLearnerState | null {
       )
     : current.recentActivity;
 
+  const streakDays = nextStreak(current, new Date(occurredAt));
+  // Five days running earns its badge here rather than anywhere else, so it
+  // cannot be missed by a caller that forgot to check.
+  const withStreak =
+    streakDays >= 5 && !earnedBadges.includes('streak-keeper')
+      ? [...earnedBadges, 'streak-keeper']
+      : earnedBadges;
+
   const next: StoredLearnerState = {
     ...current,
     ...reward.patch,
-    earnedBadges,
+    earnedBadges: withStreak,
     recentActivity,
     progress: {
       ...current.progress,
       currentXp,
       level,
       nextLevelXp,
-      badgeCount: earnedBadges.length,
+      streakDays,
+      badgeCount: withStreak.length,
     },
     lastActivityAt: occurredAt,
   };
@@ -146,6 +190,14 @@ export function useLearnerProgress(): UseLearnerProgress {
     applyReward({ xp: amount, activity, badgeIds });
   }, []);
 
+  const recordActivity = useCallback<UseLearnerProgress['recordActivity']>((result) => {
+    const current = getLearnerSnapshot();
+    if (!current) return;
+    applyReward({
+      patch: { activityResults: { ...current.activityResults, [result.key]: result } },
+    });
+  }, []);
+
   const earnBadge = useCallback<UseLearnerProgress['earnBadge']>((badgeId) => {
     const current = getLearnerSnapshot();
     if (!current || current.earnedBadges.includes(badgeId)) return;
@@ -182,14 +234,11 @@ export function useLearnerProgress(): UseLearnerProgress {
       completedLessons.includes(`${courseId}/${entry.id}`),
     );
 
-    const badgeIds = [lesson.badgeId];
-    if (courseCompleted) badgeIds.push(course.badgeId, 'course-finisher');
-
-    const xp = lesson.xpReward + (courseCompleted ? course.completionXp : 0);
-
+    // The course badge is deliberately *not* awarded here — that waits for the
+    // capstone.
     applyReward({
-      xp,
-      badgeIds,
+      xp: lesson.xpReward,
+      badgeIds: [lesson.badgeId],
       patch: { completedLessons },
       activity: {
         id: `lesson-${courseId}-${lessonId}`,
@@ -198,7 +247,38 @@ export function useLearnerProgress(): UseLearnerProgress {
       },
     });
 
-    return { xp, badgeIds, courseCompleted };
+    return { xp: lesson.xpReward, badgeIds: [lesson.badgeId], courseCompleted };
+  }, []);
+
+  const completeCapstone = useCallback<UseLearnerProgress['completeCapstone']>((courseId) => {
+    const current = getLearnerSnapshot();
+    const course = findCourse(courseId);
+    if (!current || !course) return null;
+
+    const key = `capstone:${courseId}`;
+    if (current.completedLessons.includes(key)) return null;
+
+    const completedLessons = [...current.completedLessons, key];
+    const badgeIds = [course.capstone.badgeId];
+
+    // The graduate badge lands once every capstone is in.
+    const allDone = courses.every((entry) =>
+      completedLessons.includes(`capstone:${entry.id}`),
+    );
+    if (allDone) badgeIds.push('graduate');
+
+    applyReward({
+      xp: course.capstone.xpReward,
+      badgeIds,
+      patch: { completedLessons },
+      activity: {
+        id: `capstone-${courseId}`,
+        label: `Completed ${course.capstone.title}`,
+        detail: course.title,
+      },
+    });
+
+    return { xp: course.capstone.xpReward, badgeIds, courseCompleted: true };
   }, []);
 
   const reset = useCallback(() => clearLearnerState(), []);
@@ -210,6 +290,8 @@ export function useLearnerProgress(): UseLearnerProgress {
     awardXp,
     completeChallenge,
     completeLesson,
+    completeCapstone,
+    recordActivity,
     earnBadge,
     reset,
   };
