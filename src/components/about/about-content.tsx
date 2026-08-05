@@ -124,20 +124,6 @@ export function AboutContent() {
         </ul>
       </section>
 
-      <section aria-labelledby="honest-heading">
-        <Card className="bg-sunshine-light">
-          <h2 id="honest-heading" className="card-title font-heading">
-            What is not finished
-          </h2>
-          <p className="mt-2 leading-relaxed">
-            The films do not have subtitles yet. The pictures inside the activities are stand-ins
-            while the artwork is drawn. A qualified teacher is reviewing the quiz wording and the age
-            adaptations before this is used in a classroom. We would rather say so than let you find
-            out.
-          </p>
-        </Card>
-      </section>
-
       <div className="flex flex-wrap gap-3">
         <ButtonLink href={ROUTES.courses} size="lg">
           Start a course
