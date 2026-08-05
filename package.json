@@ -20,9 +20,10 @@
     "check:api": "node scripts/check-tutor-api.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:live": "node scripts/check-live-ai.mjs",
-    "check:units": "npm run check:images && npm run check:safety && npm run check:output && npm run check:challenges && npm run check:curriculum && npm run check:reveal",
+    "check:units": "npm run check:images && npm run check:safety && npm run check:output && npm run check:challenges && npm run check:curriculum && npm run check:reveal && npm run check:video",
     "check": "npm run typecheck && npm run lint && npm run check:pages && npm run check:api && npm run check:bundle",
-    "build:video": "node scripts/build-video.mjs"
+    "build:video": "node scripts/build-video.mjs",
+    "check:video": "node scripts/check-video-wiring.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

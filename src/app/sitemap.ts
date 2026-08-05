@@ -24,6 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ROUTES.parents,
     ROUTES.about,
     ROUTES.privacy,
+    ROUTES.terms,
+    ROUTES.pricing,
     ROUTES.ageSelect,
   ];
 

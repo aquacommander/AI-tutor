@@ -8,6 +8,33 @@ export const SITE = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
 } as const;
 
+/**
+ * Contact and social handles.
+ *
+ * Read from the environment and rendered only when set, so the footer never
+ * shows a link to an account that does not exist yet. Fill these in as the
+ * accounts are created:
+ *
+ *   NEXT_PUBLIC_CONTACT_EMAIL, NEXT_PUBLIC_SUPPORT_EMAIL
+ *   NEXT_PUBLIC_INSTAGRAM, NEXT_PUBLIC_YOUTUBE, NEXT_PUBLIC_FACEBOOK, NEXT_PUBLIC_TIKTOK
+ */
+export const CONTACT = {
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null,
+  support: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? null,
+} as const;
+
+export interface SocialLink {
+  label: string;
+  href: string;
+}
+
+export const SOCIAL: SocialLink[] = [
+  { label: 'Instagram', href: process.env.NEXT_PUBLIC_INSTAGRAM },
+  { label: 'YouTube', href: process.env.NEXT_PUBLIC_YOUTUBE },
+  { label: 'Facebook', href: process.env.NEXT_PUBLIC_FACEBOOK },
+  { label: 'TikTok', href: process.env.NEXT_PUBLIC_TIKTOK },
+].filter((entry): entry is SocialLink => Boolean(entry.href));
+
 export const LEARNER_STORAGE_KEY = 'ai-for-kids:learner:v1';
 
 export const ROUTES = {
@@ -24,6 +51,8 @@ export const ROUTES = {
   parents: '/for-parents',
   about: '/about',
   privacy: '/privacy',
+  terms: '/terms',
+  pricing: '/pricing',
 } as const;
 
 export interface NavChild {
@@ -63,6 +92,7 @@ export const PRIMARY_NAV: NavItem[] = [
     ],
   },
   { label: 'Courses', href: ROUTES.courses },
+  { label: 'Pricing', href: ROUTES.pricing },
   { label: 'Stories', href: ROUTES.stories },
   { label: 'For Parents', href: ROUTES.parents },
   { label: 'About Us', href: ROUTES.about },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -36,6 +36,27 @@ export function LessonVideoPlayer({ video, title, onWatched }: LessonVideoPlayer
   const reported = useRef(false);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
+
+  /**
+   * Reload when the film changes.
+   *
+   * This is the bug that made every lesson after the first look broken. Setting
+   * a new `src` on a `<video>` element does **not** load it — the element keeps
+   * whatever media it already had until `load()` is called. React reuses the
+   * same DOM node when only the props change, so navigating from one lesson to
+   * the next swapped the attribute and left the old film in place.
+   *
+   * Resetting the local state here too, so the play button comes back and the
+   * "watched" report can fire again for the new film.
+   */
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    reported.current = false;
+    setStarted(false);
+    setFinished(false);
+    element.load();
+  }, [video.src]);
 
   const replay = () => {
     const element = ref.current;

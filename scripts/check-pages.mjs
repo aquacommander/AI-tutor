@@ -40,6 +40,8 @@ const ROUTES = [
   ['/for-parents', 'Erase everything'],
   ['/privacy', 'pending legal review'],
   ['/about', 'What we think matters'],
+  ['/pricing', 'All four courses'],
+  ['/terms', 'Refunds'],
   ['/certificate', 'certificate'],
   ['/courses/ai-detective-academy/picture-clue-patrol/sheet', 'answer key'],
   ['/sitemap.xml', '/courses/ai-detective-academy'],

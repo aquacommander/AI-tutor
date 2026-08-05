@@ -45,7 +45,9 @@
     ".next-quick/types/**/*.ts",
     ".next-bundle-check/types/**/*.ts",
     ".next-check-pages/types/**/*.ts",
-    ".next-check-live/types/**/*.ts"
+    ".next-check-live/types/**/*.ts",
+    ".next-vidcheck/types/**/*.ts",
+    ".next-price/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

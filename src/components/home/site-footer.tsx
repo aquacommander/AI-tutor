@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/container';
 import { Logo } from '@/components/ui/logo';
-import { ROUTES, SITE } from '@/lib/constants';
+import { CONTACT, SOCIAL, ROUTES, SITE } from '@/lib/constants';
 import { imgSrc } from '@/lib/images';
 
 const FOOTER_SECTIONS = [
@@ -29,7 +29,9 @@ const FOOTER_SECTIONS = [
     links: [
       { label: 'For Parents', href: ROUTES.parents },
       { label: 'About Us', href: ROUTES.about },
-      { label: 'Privacy', href: '/privacy' },
+      { label: 'Pricing', href: ROUTES.pricing },
+      { label: 'Privacy', href: ROUTES.privacy },
+      { label: 'Terms', href: ROUTES.terms },
     ],
   },
 ];
@@ -129,6 +131,32 @@ export function SiteFooter() {
               Guest mode keeps learning progress on this device only. No advertising or behavioural
               tracking scripts are used.
             </p>
+
+            {/* Contact and social render only when configured, so the footer
+                never links to an account that has not been created yet. */}
+            {CONTACT.email || SOCIAL.length > 0 ? (
+              <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+                {CONTACT.email ? (
+                  <a
+                    href={`mailto:${CONTACT.email}`}
+                    className="font-semibold text-primary hover:text-primary-dark"
+                  >
+                    {CONTACT.email}
+                  </a>
+                ) : null}
+                {SOCIAL.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className="font-semibold text-primary hover:text-primary-dark"
+                  >
+                    {social.label}
+                  </a>
+                ))}
+              </p>
+            ) : null}
           </div>
         </Container>
       </div>

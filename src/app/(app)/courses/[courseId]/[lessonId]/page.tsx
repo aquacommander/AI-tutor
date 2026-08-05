@@ -29,7 +29,11 @@ export default function LessonPage({ params }: PageProps) {
   if (!found) notFound();
 
   return (
+    // Keyed on the lesson: without it, moving between lessons keeps the step
+    // index from the previous one, so a child who finished lesson 1 landed on
+    // the last step of lesson 2 and never reached its film.
     <LessonView
+      key={`${params.courseId}/${params.lessonId}`}
       course={found.course}
       lesson={found.lesson}
       previous={found.previous}

@@ -163,7 +163,14 @@ export function LessonView({ course, lesson, previous, next }: LessonViewProps) 
               </span>
             </p>
           </Card>
-          <LessonVideoPlayer video={lesson.video} title={lesson.title} onWatched={() => {}} />
+          {/* Keyed on the film so React builds a new <video> rather than
+              re-pointing the old one. */}
+          <LessonVideoPlayer
+            key={lesson.video.src}
+            video={lesson.video}
+            title={lesson.title}
+            onWatched={() => {}}
+          />
           <Button size="lg" onClick={goNext} className="w-full">
             I have watched it
             <ArrowRight className="size-5" aria-hidden="true" />
