@@ -36,7 +36,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Lesson films — hosted on a CDN, not in the repo.
-# Lesson 1 is committed deliberately so the demo works from a fresh clone.
-# 138 MB of film. Move to a CDN before launch; see README.
-/public/videos/**
+# Lesson films ARE committed.
+#
+# They were ignored here once, and the result was a deployed site with exactly
+# one working video — the only one that happened to be tracked. Until the films
+# move to a CDN (set NEXT_PUBLIC_VIDEO_BASE_URL), they have to ship with the
+# repo, because a deployment builds from what git holds and nothing else.
