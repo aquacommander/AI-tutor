@@ -462,14 +462,3 @@ Verified in this milestone, at 320 / 375 / 768 / 1024 / 1440px:
 - Decorative images use `alt=""`; meaningful ones are described.
 
 ---
-
-## Notes for the next milestone
-
-- `ANTHROPIC_API_KEY` is server-side only. Never expose it with `NEXT_PUBLIC_`.
-- Sparky must be reached through `POST /api/ai-tutor`, never called from the
-  browser. The homepage only advertises Sparky; it must not load the AI API.
-- `framer-motion` was removed. Every animation in the design is achievable with
-  CSS keyframes (see `tailwind.config.ts`), and those respect reduced motion for
-  free. Reintroduce it only if a real need appears.
-- The body font needs a hand-computed fallback; see the comment in
-  `src/lib/fonts.ts` before changing it.
