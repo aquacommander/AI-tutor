@@ -448,7 +448,7 @@ The safety banner likewise avoids absolute legal claims ("100% safe",
 
 ---
 
-Verified in this milestone, at 320 / 375 / 768 / 1024 / 1440px:
+
 
 - No horizontal overflow on any page at any tested width.
 - Every link and button is at least 44px high.
